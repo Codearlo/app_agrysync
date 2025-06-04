@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -15,9 +16,10 @@
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/dark_mode.css">
     <link rel="stylesheet" href="css/responsive_utilities.css">
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
     <div class="app-container">
         <!-- Contenedor para el Header Dinámico -->
@@ -26,7 +28,7 @@
         </header>
 
         <!-- Page: Home -->
-        <div id="home" class="page"> 
+        <div id="home" class="page">
             <main class="main-content">
                 <!-- Contenido de Home -->
                 <section class="weather-card card">
@@ -51,7 +53,9 @@
                             <div class="weather-label">km/h</div>
                         </div>
                     </div>
-                    <div id="weather-location" style="text-align: center; margin-top: 15px; font-size: 0.875rem; opacity: 0.8;">Obteniendo ubicación...</div>
+                    <div id="weather-location"
+                        style="text-align: center; margin-top: 15px; font-size: 0.875rem; opacity: 0.8;">Obteniendo
+                        ubicación...</div>
                 </section>
 
                 <section class="quick-actions">
@@ -71,7 +75,8 @@
                         <h3 class="section-title">Mis Plantas</h3>
                     </div>
                     <div id="plants-list-container" class="plants-list">
-                        <p id="no-plants-message" style="display: none; text-align: center; color: var(--gray-500);">Aún no has añadido ninguna planta. ¡Ve a tu perfil para empezar!</p>
+                        <p id="no-plants-message" style="display: none; text-align: center; color: var(--gray-500);">Aún
+                            no has añadido ninguna planta. ¡Ve a tu perfil para empezar!</p>
                     </div>
                 </section>
 
@@ -81,15 +86,17 @@
                         <h3 class="section-title">Alertas Recientes</h3>
                     </div>
                     <div class="notifications-list">
-                         <div class="notification notification-high">
+                        <div class="notification notification-high">
                             <div class="notification-content">
-                                <div class="notification-text"><i class="fas fa-exclamation-triangle"></i> Posible plaga detectada en tomates</div>
+                                <div class="notification-text"><i class="fas fa-exclamation-triangle"></i> Posible plaga
+                                    detectada en tomates</div>
                                 <div class="notification-time">hace 5 min</div>
                             </div>
                         </div>
                         <div class="notification notification-success">
-                             <div class="notification-content">
-                                <div class="notification-text"><i class="fas fa-check-circle"></i> Compostaje óptimo - pH perfecto</div>
+                            <div class="notification-content">
+                                <div class="notification-text"><i class="fas fa-check-circle"></i> Compostaje óptimo -
+                                    pH perfecto</div>
                                 <div class="notification-time">hace 1h</div>
                             </div>
                         </div>
@@ -111,16 +118,17 @@
                             <span class="camera-emoji"><i class="fas fa-camera-retro"></i></span>
                             <p>Apunta a la hoja afectada y toma una foto clara.</p>
                         </div>
-                        <button class="camera-btn" onclick="simulateCamera(event)"><i class="fas fa-camera"></i> Tomar Foto</button>
+                        <button class="camera-btn" onclick="simulateCamera(event)"><i class="fas fa-camera"></i> Tomar
+                            Foto</button>
                     </div>
                 </section>
-                 <section class="card">
+                <section class="card">
                     <div class="section-header">
                         <span class="section-emoji"><i class="fas fa-microscope"></i></span>
                         <h3 class="section-title">Resultados del Análisis</h3>
                     </div>
                     <div class="analysis-results">
-                         <div class="analysis-card analysis-warning">
+                        <div class="analysis-card analysis-warning">
                             <div class="analysis-header">
                                 <span class="analysis-emoji"><i class="fas fa-exclamation-triangle"></i></span>
                                 <h4 class="analysis-title">Riesgo Detectado</h4>
@@ -135,11 +143,11 @@
         <!-- Page: Compost Calculator -->
         <div id="compost" class="page">
             <main class="main-content">
-                 <div class="page-header">
+                <div class="page-header">
                     <h2><i class="fas fa-calculator"></i> Calculadora de Compostaje</h2>
                     <p>Planifica tu compostaje para obtener el mejor abono.</p>
                 </div>
-                 <section class="card">
+                <section class="card">
                     <div class="section-header">
                         <span class="section-emoji"><i class="fas fa-balance-scale"></i></span>
                         <h3 class="section-title">Ingresa tus Datos</h3>
@@ -147,11 +155,12 @@
                     <div class="compost-calculator-input">
                         <label for="compost-amount">Cantidad de compost deseada (kg):</label>
                         <input type="number" id="compost-amount" value="1" min="0.5" step="0.5">
-                        <button id="calculate-compost-btn" class="action-btn" style="margin-top: 1rem; width: 100%;"><i class="fas fa-cogs"></i> Calcular</button>
+                        <button id="calculate-compost-btn" class="action-btn" style="margin-top: 1rem; width: 100%;"><i
+                                class="fas fa-cogs"></i> Calcular</button>
                     </div>
                 </section>
                 <section id="compost-results-section" class="card" style="display: none;">
-                     <div class="section-header">
+                    <div class="section-header">
                         <span class="section-emoji"><i class="fas fa-chart-pie"></i></span>
                         <h3 class="section-title">Resultados Estimados</h3>
                     </div>
@@ -161,16 +170,16 @@
                 </section>
             </main>
         </div>
-        
+
         <!-- Page: Assistant -->
         <div id="assistant" class="page">
             <main class="main-content">
-                 <div class="page-header">
+                <div class="page-header">
                     <h2><i class="fas fa-comments"></i> Chatea con AgriBot</h2>
                     <p>Resuelve tus dudas sobre jardinería y agricultura.</p>
                 </div>
                 <section class="card" style="padding: 0; overflow:visible;">
-                    <div class="chat-interface"> 
+                    <div class="chat-interface">
                         <div class="chat-messages">
                             <div class="message bot">¡Hola! Soy AgriBot. ¿Cómo puedo ayudarte con tu jardín hoy?</div>
                         </div>
@@ -190,7 +199,9 @@
                     <div class="profile-avatar" id="profile-avatar-initials">--</div>
                     <h3 id="profile-username">Nombre de Usuario</h3>
                     <p class="profile-level" id="profile-email">correo@ejemplo.com</p>
-                    <button id="logout-btn" class="action-btn danger" style="margin-top: 1.5rem; background: var(--danger);"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+                    <button id="logout-btn" class="action-btn danger"
+                        style="margin-top: 1.5rem; background: var(--danger);"><i class="fas fa-sign-out-alt"></i>
+                        Cerrar Sesión</button>
                 </section>
 
                 <section class="card">
@@ -232,13 +243,14 @@
     </nav>
 
     <!-- JavaScript Modularizado -->
-    <script src="js/ui.js"></script>
+    <script src="js/ui.js"></script> <!-- ui.js DEBE estar antes que main.js -->
     <script src="js/weather.js"></script>
     <script src="js/camera.js"></script>
     <script src="js/compost.js"></script>
-    <script src="js/auth.js"></script> 
+    <script src="js/auth.js"></script>
     <script src="js/assistant.js"></script>
-    <script src="js/plants.js"></script> 
-    <script src="js/main.js"></script> 
+    <script src="js/plants.js"></script>
+    <script src="js/main.js"></script>
 </body>
+
 </html>
