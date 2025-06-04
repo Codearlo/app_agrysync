@@ -17,7 +17,6 @@ async function loadAppHeaderStructure() {
         console.error("UI ERROR: Contenedor principal del header (#main-app-header) no encontrado en index.html.");
         return false;
     }
-    // Usar ruta relativa desde index.html
     const headerPath = 'includes/app_header.html'; 
     console.log(`UI LOG: Intentando cargar header desde: ${headerPath}`);
     try {
@@ -51,7 +50,6 @@ async function loadBottomNavigationStructure() {
         console.error("UI ERROR: Contenedor de la barra de navegación (#main-bottom-nav) no encontrado en index.html.");
         return false;
     }
-    // Usar ruta relativa desde index.html
     const navPath = 'includes/bottom_navigation.html'; 
     console.log(`UI LOG: Intentando cargar navegación desde: ${navPath}`);
     try {
@@ -123,6 +121,7 @@ function showPage(pageId) {
         
         const currentNotificationBadge = document.getElementById('header-notification-badge');
         const currentNotificationCount = currentNotificationBadge ? parseInt(currentNotificationBadge.textContent) : 0;
+        // Asegurarse que updateAppHeader se llame incluso si currentNotificationCount es NaN
         updateAppHeader(pageId, isNaN(currentNotificationCount) ? 0 : currentNotificationCount);
     } else {
         console.warn(`UI WARNING: Página con ID '${pageId}' no encontrada en el DOM.`);
@@ -138,8 +137,6 @@ function showPage(pageId) {
                 item.classList.add('active');
             }
         });
-    } else {
-        // console.warn("UI WARNING: Contenedor de navegación o items no encontrados para actualizar estado activo.");
     }
 }
 
@@ -151,42 +148,54 @@ function initializeDarkMode() {
     const darkModeToggleContainer = document.getElementById('darkModeToggleContainer');
     const darkModeCheckbox = document.getElementById('darkModeToggle'); 
 
+    if (!darkModeToggleContainer || !darkModeCheckbox) {
+        console.warn("UI WARNING: Elementos para el toggle de modo oscuro no encontrados.");
+        return;
+    }
+
     if (savedDarkMode === 'enabled') {
         document.body.classList.add('dark-mode');
-        if (darkModeToggleContainer) darkModeToggleContainer.classList.add('active');
-        if (darkModeCheckbox) darkModeCheckbox.checked = true;
+        darkModeToggleContainer.classList.add('active');
+        darkModeCheckbox.checked = true;
     } else {
-        if (darkModeToggleContainer) darkModeToggleContainer.classList.remove('active');
-        if (darkModeCheckbox) darkModeCheckbox.checked = false;
+        document.body.classList.remove('dark-mode'); // Asegurar que no esté si no está enabled
+        darkModeToggleContainer.classList.remove('active');
+        darkModeCheckbox.checked = false;
     }
     
-    if (darkModeToggleContainer && typeof toggleDarkMode === 'function') {
-        darkModeToggleContainer.addEventListener('click', () => {
-            if(darkModeCheckbox) darkModeCheckbox.click(); 
-            toggleDarkMode(); 
-        });
-    }
+    // El event listener se añade en main.js para asegurar que toggleDarkMode esté definida.
+    // Si se mueve aquí, asegurarse que toggleDarkMode esté definida antes.
 }
 
 /**
  * Alterna el modo oscuro en la aplicación.
  */
 function toggleDarkMode() {
+    if (!document.body || !document.body.classList) {
+        console.error("UI ERROR: document.body o document.body.classList no está disponible en toggleDarkMode.");
+        return;
+    }
     document.body.classList.toggle('dark-mode');
     const isDarkMode = document.body.classList.contains('dark-mode');
     localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
     
     const darkModeToggleContainer = document.getElementById('darkModeToggleContainer');
+    const darkModeCheckbox = document.getElementById('darkModeToggle');
+
     if (darkModeToggleContainer) {
         if (isDarkMode) {
             darkModeToggleContainer.classList.add('active');
         } else {
             darkModeToggleContainer.classList.remove('active');
         }
+    } else {
+        console.warn("UI WARNING: Contenedor del toggle de modo oscuro no encontrado en toggleDarkMode.");
     }
-    const darkModeCheckbox = document.getElementById('darkModeToggle');
+
      if(darkModeCheckbox) {
         darkModeCheckbox.checked = isDarkMode;
+    } else {
+        console.warn("UI WARNING: Checkbox del toggle de modo oscuro no encontrado en toggleDarkMode.");
     }
 }
 
@@ -197,21 +206,18 @@ function initializeLocationToggle() {
     const locationToggleContainer = document.getElementById('locationToggleContainer');
     const locationCheckbox = document.getElementById('locationToggle');
 
-    if (locationToggleContainer && locationCheckbox) {
-        if(locationCheckbox.checked) {
-            locationToggleContainer.classList.add('active');
-        } else {
-            locationToggleContainer.classList.remove('active');
-        }
-
-        locationToggleContainer.addEventListener('click', () => {
-            locationCheckbox.checked = !locationCheckbox.checked; 
-            locationToggleContainer.classList.toggle('active', locationCheckbox.checked); 
-            if (typeof getGeoLocationAndFetchWeather === 'function') { 
-                getGeoLocationAndFetchWeather(); 
-            }
-        });
+    if (!locationToggleContainer || !locationCheckbox) {
+        console.warn("UI WARNING: Elementos para el toggle de ubicación no encontrados.");
+        return;
     }
+
+    if(locationCheckbox.checked) {
+        locationToggleContainer.classList.add('active');
+    } else {
+        locationToggleContainer.classList.remove('active');
+    }
+
+    // El event listener se añade en main.js
 }
 
 /**
@@ -240,13 +246,6 @@ function initializeGenericToggles() {
             toggle.classList.add('active');
         }
 
-        toggle.addEventListener('click', function() {
-            if (!this.id || (this.id !== 'darkModeToggleContainer' && this.id !== 'locationToggleContainer')) {
-                 this.classList.toggle('active');
-                 if (checkbox) {
-                    checkbox.checked = this.classList.contains('active');
-                 }
-            }
-        });
+        // El event listener se añade en main.js
     });
 }
