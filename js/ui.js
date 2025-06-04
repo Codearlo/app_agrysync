@@ -5,12 +5,11 @@ const pageSpecificHeaders = {
     diagnosis: { title: "Diagnóstico IA", subtitle: "Detecta problemas en tus plantas" },
     compost: { title: "Compostaje Pro <i class=\"fas fa-recycle\"></i>", subtitle: "Calcula y aprende a compostar" },
     assistant: { title: "Asistente IA <i class=\"fas fa-brain\"></i>", subtitle: "Tu consejero agrícola personal" },
-    profile: { title: "Mi Perfil", subtitle: "Agricultor Urbano Apasionado" } // Subtítulo puede ser actualizado por auth.js
+    profile: { title: "Mi Perfil", subtitle: "Agricultor Urbano Apasionado" } 
 };
 
 /**
- * Carga la estructura del header desde un archivo HTML y la inserta en el DOM.
- * Esta función se llamará una vez al cargar la aplicación principal.
+ * Carga la estructura del header desde un archivo HTML.
  */
 async function loadAppHeaderStructure() {
     const headerContainer = document.getElementById('main-app-header');
@@ -19,24 +18,49 @@ async function loadAppHeaderStructure() {
         return false;
     }
     try {
-        const response = await fetch('includes/app_header.html'); // Ruta al archivo del header
+        const response = await fetch('includes/app_header.html'); 
         if (!response.ok) {
             throw new Error(`No se pudo cargar includes/app_header.html. Estado: ${response.status}`);
         }
         const headerHtml = await response.text();
         headerContainer.innerHTML = headerHtml;
-        return true; // Indica que el header se cargó
+        return true; 
     } catch (error) {
         console.error("Error cargando la estructura del header:", error);
-        headerContainer.innerHTML = "<p>Error al cargar el header.</p>"; // Mensaje de error en el header
+        headerContainer.innerHTML = "<p style='color:white; text-align:center; padding:1rem;'>Error al cargar el header.</p>";
         return false;
     }
 }
 
 /**
- * Actualiza el contenido del header dinámico (título, subtítulo, notificaciones).
- * @param {string} pageId - El ID de la página actual para determinar el título/subtítulo.
- * @param {number} notificationCount - (Opcional) Número de notificaciones a mostrar.
+ * Carga la estructura de la barra de navegación inferior desde un archivo HTML.
+ */
+async function loadBottomNavigationStructure() {
+    const navContainer = document.getElementById('main-bottom-nav');
+    if (!navContainer) {
+        console.error("Contenedor de la barra de navegación (#main-bottom-nav) no encontrado.");
+        return false;
+    }
+    try {
+        const response = await fetch('includes/bottom_navigation.html');
+        if (!response.ok) {
+            throw new Error(`No se pudo cargar includes/bottom_navigation.html. Estado: ${response.status}`);
+        }
+        const navHtml = await response.text();
+        navContainer.innerHTML = navHtml;
+        return true; // Indica que la navegación se cargó
+    } catch (error) {
+        console.error("Error cargando la estructura de la navegación inferior:", error);
+        navContainer.innerHTML = "<p style='text-align:center; padding:1rem;'>Error al cargar navegación.</p>";
+        return false;
+    }
+}
+
+
+/**
+ * Actualiza el contenido del header dinámico.
+ * @param {string} pageId - El ID de la página actual.
+ * @param {number} notificationCount - (Opcional) Número de notificaciones.
  */
 function updateAppHeader(pageId, notificationCount = null) {
     const headerTitleEl = document.getElementById('header-app-title');
@@ -44,30 +68,23 @@ function updateAppHeader(pageId, notificationCount = null) {
     const notificationBadgeEl = document.getElementById('header-notification-badge');
 
     if (!headerTitleEl || !headerSubtitleEl || !notificationBadgeEl) {
-        // Esto puede ocurrir si el header aún no se ha cargado completamente
-        // console.warn("Elementos del header no encontrados para actualizar. Esperando carga...");
         return;
     }
 
     const headerData = pageSpecificHeaders[pageId] || { title: "AgroSync", subtitle: "Bienvenido" };
     
-    headerTitleEl.innerHTML = headerData.title; // Usar innerHTML para permitir iconos
+    headerTitleEl.innerHTML = headerData.title; 
     headerSubtitleEl.textContent = headerData.subtitle;
 
     if (notificationCount !== null) {
         notificationBadgeEl.textContent = notificationCount;
         notificationBadgeEl.style.display = notificationCount > 0 ? 'flex' : 'none';
-    } else {
-        // Si no se pasa, mantener el valor actual o uno por defecto
-        // Por ahora, lo dejamos como está si es null, o podrías ocultarlo
-        // notificationBadgeEl.style.display = 'none'; 
     }
 }
 
 
 /**
- * Muestra la página especificada y oculta las demás.
- * Actualiza el estado activo en la barra de navegación y el header.
+ * Muestra la página especificada y actualiza la navegación y el header.
  * @param {string} pageId El ID de la página a mostrar.
  */
 function showPage(pageId) {
@@ -82,17 +99,20 @@ function showPage(pageId) {
         const mainContent = activePage.querySelector('.main-content') || activePage;
         if (mainContent) mainContent.scrollTop = 0;
         
-        // Actualizar el header dinámico
-        updateAppHeader(pageId, parseInt(document.getElementById('header-notification-badge')?.textContent || '0')); // Pasar el conteo actual de notificaciones
+        updateAppHeader(pageId, parseInt(document.getElementById('header-notification-badge')?.textContent || '0'));
     }
 
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(`showPage('${pageId}')`)) {
-            item.classList.add('active');
-        }
-    });
+    // Actualizar estado activo de la barra de navegación (si ya está cargada)
+    const navContainer = document.getElementById('main-bottom-nav');
+    if (navContainer && navContainer.children.length > 0) { // Verificar que los items estén cargados
+        const navItems = navContainer.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(`showPage('${pageId}')`)) {
+                item.classList.add('active');
+            }
+        });
+    }
 }
 
 /**

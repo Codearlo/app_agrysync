@@ -1,63 +1,63 @@
 // js/main.js
 
-document.addEventListener('DOMContentLoaded', async function() { // Hacer la función async
-    // --- VERIFICACIÓN DE AUTENTICACIÓN AL CARGAR INDEX.HTML ---
+document.addEventListener('DOMContentLoaded', async function() { 
     const loggedInUser = checkLoginStatus(); 
-    const bottomNav = document.querySelector('.bottom-nav');
-    const mainAppHeaderContainer = document.getElementById('main-app-header'); // El contenedor <header>
+    const mainAppHeaderContainer = document.getElementById('main-app-header');
+    const mainBottomNavContainer = document.getElementById('main-bottom-nav');
 
     if (!loggedInUser) {
         window.location.href = 'login.html';
-        return; // Detener si no está logueado
+        return; 
     }
 
-    // Si el usuario está logueado, cargar el header y continuar
     let headerContentLoaded = false;
     if (typeof loadAppHeaderStructure === 'function') {
-        console.log("Intentando cargar estructura del header...");
-        headerContentLoaded = await loadAppHeaderStructure(); // Esperar a que el header se cargue
+        headerContentLoaded = await loadAppHeaderStructure(); 
     } else {
-        console.error("Función loadAppHeaderStructure no definida. Asegúrate que ui.js esté cargado y la función exportada/disponible.");
+        console.error("Función loadAppHeaderStructure no definida.");
+    }
+
+    let bottomNavContentLoaded = false;
+    if (typeof loadBottomNavigationStructure === 'function') {
+        bottomNavContentLoaded = await loadBottomNavigationStructure();
+    } else {
+        console.error("Función loadBottomNavigationStructure no definida.");
     }
 
     if (!headerContentLoaded) {
-        console.error("El contenido del header principal no se pudo cargar. La aplicación podría no funcionar correctamente. Verifica la ruta a 'includes/app_header.html' y el contenido del archivo.");
-        // Opcionalmente, podrías mostrar un mensaje de error más visible en la UI aquí
+        console.error("El contenido del header principal no se pudo cargar.");
         if(mainAppHeaderContainer) mainAppHeaderContainer.innerHTML = "<p style='color:white; text-align:center; padding:1rem;'>Error al cargar el header.</p>";
-        // Decidimos si continuar o no. Si el header es crítico, podríamos retornar.
-        // return; 
+    }
+    if (!bottomNavContentLoaded) {
+        console.error("El contenido de la navegación inferior no se pudo cargar.");
+        if(mainBottomNavContainer) mainBottomNavContainer.innerHTML = "<p style='text-align:center; padding:0.5rem;'>Error al cargar navegación.</p>";
     }
     
-    // Solo continuar con la inicialización completa de la UI si el header (o al menos su intento de carga) ha ocurrido.
     if (typeof updateUIAfterLogin === 'function') {
-        updateUIAfterLogin(loggedInUser); // Actualizar info de perfil que podría estar en el header o en la página de perfil
+        updateUIAfterLogin(loggedInUser); 
     } else {
         console.error("Función updateUIAfterLogin no definida.");
     }
 
-    if (bottomNav) {
-        bottomNav.style.display = 'flex'; 
+    if (mainBottomNavContainer && bottomNavContentLoaded) { // Mostrar solo si se cargó
+        mainBottomNavContainer.style.display = 'flex'; 
         console.log("Barra de navegación inferior debería estar visible.");
-    } else {
-        console.error("Elemento .bottom-nav no encontrado.");
+    } else if (mainBottomNavContainer) {
+        mainBottomNavContainer.style.display = 'none'; // Ocultar si no se cargó bien
     }
     
-    // Mostrar página de inicio por defecto para usuarios logueados
-    // Esto también llamará a updateAppHeader para establecer el título/subtítulo correcto
     if (typeof showPage === 'function') {
         showPage('home'); 
     } else {
         console.error("Función showPage no definida.");
     }
 
-    // Cargar plantas del usuario
     if (typeof fetchAndDisplayPlants === 'function') {
         fetchAndDisplayPlants(); 
     } else {
         console.error("Función fetchAndDisplayPlants no definida.");
     }
     
-    // --- EVENT LISTENER BOTÓN DE CERRAR SESIÓN ---
     const logoutButton = document.getElementById('logout-btn');
     if (logoutButton && typeof logoutUser === 'function') {
         logoutButton.addEventListener('click', logoutUser);
@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', async function() { // Hacer la fun
         console.error("Función logoutUser no definida pero el botón existe.");
     }
 
-    // --- INICIALIZACIÓN DEL MODO OSCURO ---
     const savedDarkMode = localStorage.getItem('darkMode');
     const darkModeToggleContainer = document.getElementById('darkModeToggleContainer');
     const darkModeCheckbox = document.getElementById('darkModeToggle'); 
@@ -86,7 +85,6 @@ document.addEventListener('DOMContentLoaded', async function() { // Hacer la fun
         });
     }
     
-    // --- INICIALIZACIÓN DEL CLIMA ---
     if (typeof getGeoLocationAndFetchWeather === 'function') {
         getGeoLocationAndFetchWeather();
     }
@@ -110,20 +108,16 @@ document.addEventListener('DOMContentLoaded', async function() { // Hacer la fun
         });
     }
     
-    // --- EVENT LISTENER CALCULADORA DE COMPOSTAJE ---
     const calculateCompostBtn = document.getElementById('calculate-compost-btn');
     if (calculateCompostBtn && typeof calculateCompost === 'function') {
         calculateCompostBtn.addEventListener('click', calculateCompost);
     }
 
-    // --- INICIALIZACIÓN DEL CHAT DEL ASISTENTE ---
-    // Las variables chatMessagesContainerAssistant, etc., se deben declarar globalmente en assistant.js o pasarse
     if (typeof addMessageToChat === 'function' && typeof getGeminiResponse === 'function') { 
-        // Asegurarse que los elementos del DOM del chat existan antes de añadir listeners
         const assistantPage = document.getElementById('assistant');
-        if (assistantPage) { // Solo configurar si la página del asistente existe en el DOM
+        if (assistantPage) { 
             chatMessagesContainerAssistant = assistantPage.querySelector('.chat-messages');
-            userInputAssistant = assistantPage.querySelector('#userInput'); // Asumir que el ID es único o está dentro de #assistant
+            userInputAssistant = assistantPage.querySelector('#userInput'); 
             sendMessageBtnAssistant = assistantPage.querySelector('#sendMessageBtn');  
 
             if (sendMessageBtnAssistant && userInputAssistant && chatMessagesContainerAssistant) {
@@ -142,19 +136,15 @@ document.addEventListener('DOMContentLoaded', async function() { // Hacer la fun
                         if(sendMessageBtnAssistant) sendMessageBtnAssistant.click();
                     }
                 });
-            } else {
-                // console.warn("Elementos del chat del asistente no encontrados en la página del asistente.");
             }
         }
     }
 
-    // --- FUNCIONALIDAD DE PLANTAS (FORMULARIO DE AÑADIR) ---
     const addPlantForm = document.getElementById('add-plant-form');
     if (addPlantForm && typeof handleAddPlantFormSubmit === 'function') {
         addPlantForm.addEventListener('submit', handleAddPlantFormSubmit);
     }
     
-    // --- FEEDBACK TÁCTIL VISUAL ---
     document.querySelectorAll('button, .nav-item, .action-btn, .toggle-switch').forEach(element => {
         element.addEventListener('touchstart', function() {
             this.style.transform = 'scale(0.97)';
@@ -164,7 +154,6 @@ document.addEventListener('DOMContentLoaded', async function() { // Hacer la fun
         });
     });
 
-    // --- CONFIGURACIÓN DE INTERRUPTORES GENÉRICOS ---
     document.querySelectorAll('.toggle-switch').forEach(toggle => {
         if(toggle.id === 'darkModeToggleContainer' || toggle.id === 'locationToggleContainer') return;
 
