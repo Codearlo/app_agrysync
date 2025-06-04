@@ -9,16 +9,16 @@
     margin-bottom: 2.5rem;
     /* Hereda estilos de .card, no necesita ::before aquí si ya lo tiene .card */
 }
-.weather-card::before { /* Sobreescribir el ::before de .card si se quiere un efecto diferente o ninguno */
-    content: ''; /* Asegurar que no herede el borde superior si no se desea */
+.weather-card::before { 
+    content: ''; 
     position: absolute;
-    top: -50%; /* Posicionamiento para el efecto radial */
+    top: -50%; 
     right: -50%;
     width: 100%;
     height: 100%;
     background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
     animation: float 8s ease-in-out infinite; 
-    transform: scaleX(1); /* Asegurar que no se anime como el borde de .card */
+    transform: scaleX(1); 
 }
 @keyframes float {
     0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
@@ -84,11 +84,28 @@
     font-weight: 500;
 }
 
-/* Quick Actions (Home) */
-.quick-actions { /* Ya tiene estilos generales en base.css si .action-btn es global */
-    /* Estilos específicos para .quick-actions si son necesarios */
-    margin-bottom: 2.5rem; /* Confirmar si este margen es solo para home */
+/* Quick Actions (Home) - AJUSTADO */
+.quick-actions { 
+    display: grid;
+    /* Reducir el tamaño mínimo de las columnas para que los botones no sean tan anchos */
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+    gap: 1rem; /* Reducir un poco el espacio entre botones */
+    margin-bottom: 2rem; /* Reducir un poco el margen inferior */
 }
+/* Los estilos de .action-btn se heredan de base.css, pero podemos sobreescribir aquí si es necesario */
+/* O ajustar los estilos globales de .action-btn en base.css si el cambio debe ser general */
+.quick-actions .action-btn { /* Aplicar cambios específicos a los botones de acción rápida en Home */
+    padding: 1.25rem 1rem; /* Reducir padding */
+    /* Otros estilos de .action-btn se mantienen */
+}
+.quick-actions .action-emoji { 
+    font-size: 2rem; /* Reducir tamaño del emoji */
+    margin-bottom: 0.5rem; /* Reducir margen inferior del emoji */
+}
+.quick-actions .action-text {
+    font-size: 0.9rem; /* Reducir tamaño del texto */
+}
+
 
 /* Plants Section */
 .plants-list {
