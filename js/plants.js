@@ -51,21 +51,40 @@ function calculateHealthPercentage(status) {
     }
 }
 
-async function fetchAndDisplayPlants() {
-    if (!plantsListContainer || !noPlantsMessage) return;
-
-    const user = checkLoginStatus(); 
-    if (!user || !user.id) {
-        plantsListContainer.innerHTML = ''; 
-        noPlantsMessage.textContent = 'Inicia sesión para ver tus plantas.';
-        noPlantsMessage.style.display = 'block';
+/**
+ * Obtiene las plantas del usuario desde el backend y las muestra.
+ * @param {number} userId - El ID del usuario para el cual obtener las plantas.
+ */
+async function fetchAndDisplayPlants(userId) { // userId ahora es un parámetro
+    if (!plantsListContainer || !noPlantsMessage) {
+        console.error("Elementos del DOM para la lista de plantas no encontrados.");
         return;
     }
 
+    if (!userId) { // Verificar si se pasó un userId válido
+        plantsListContainer.innerHTML = ''; 
+        noPlantsMessage.textContent = 'Error: No se pudo identificar al usuario para cargar las plantas.';
+        noPlantsMessage.style.display = 'block';
+        console.error("fetchAndDisplayPlants fue llamado sin un userId.");
+        return;
+    }
+
+    console.log(`Fetching plants for user ID: ${userId}`);
+
     try {
-        const response = await fetch(`backend/get_plants.php?user_id=${user.id}`); 
+        const response = await fetch(`backend/get_plants.php?user_id=${userId}`); 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            // Intentar leer el cuerpo del error si es JSON
+            let errorDetails = `HTTP error! status: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                if (errorData && errorData.error) {
+                    errorDetails += ` - ${errorData.error}`;
+                }
+            } catch (e) {
+                // El cuerpo del error no era JSON o hubo otro problema al leerlo
+            }
+            throw new Error(errorDetails);
         }
         const plants = await response.json();
 
@@ -80,19 +99,36 @@ async function fetchAndDisplayPlants() {
         }
     } catch (error) {
         console.error("Error al obtener las plantas:", error);
-        plantsListContainer.innerHTML = '<p style="color: var(--danger); text-align: center;">Error al cargar las plantas. Intenta de nuevo más tarde.</p>';
+        plantsListContainer.innerHTML = `<p style="color: var(--danger); text-align: center;">Error al cargar las plantas: ${error.message}. Intenta de nuevo más tarde.</p>`;
         noPlantsMessage.style.display = 'none';
     }
 }
 
+/**
+ * Maneja el envío del formulario para añadir una nueva planta.
+ * @param {Event} event - El evento de envío del formulario.
+ */
 async function handleAddPlantFormSubmit(event) {
     event.preventDefault(); 
 
-    const user = checkLoginStatus();
+    const user = checkLoginStatus(); // Para añadir planta, aún necesitamos saber quién es el usuario
     if (!user || !user.id) {
-        alert("Debes iniciar sesión para añadir plantas."); 
+        // En una app real, esto no debería suceder si el formulario solo es visible para usuarios logueados.
+        // Pero como el login está desactivado, usamos el user_id del objeto de prueba.
+        // Si la verificación de login estuviera activa, esto sería un alert o un mensaje en UI.
+        console.warn("Intentando añadir planta sin un usuario de localStorage. Se usará el ID del usuario de prueba si está disponible en main.js.");
+        // Para el caso de login desactivado, podríamos obtener el ID del loggedInUser de main.js si fuera global,
+        // o mejor, pasarlo si esta función se llama desde un contexto donde se conoce.
+        // Por ahora, si checkLoginStatus falla, mostramos error.
+        const addPlantMessageEl = document.getElementById('add-plant-message');
+        if (addPlantMessageEl) {
+            addPlantMessageEl.textContent = 'Error de autenticación. No se puede añadir planta.';
+            addPlantMessageEl.style.color = 'var(--danger)';
+        }
         return;
     }
+    const userIdForPlant = user.id;
+
 
     const form = event.target;
     const plantNameInput = document.getElementById('plant-name');
@@ -106,7 +142,7 @@ async function handleAddPlantFormSubmit(event) {
     }
 
     const plantData = {
-        user_id: user.id, 
+        user_id: userIdForPlant, 
         plant_name: plantNameInput.value.trim(),
         plant_description: plantDescriptionInput.value.trim(),
         health_status: plantHealthInput.value
@@ -142,12 +178,13 @@ async function handleAddPlantFormSubmit(event) {
                     noPlantsMessage.style.display = 'none';
                     plantsListContainer.innerHTML = ''; 
                 }
+                // Usar los datos devueltos por el backend para la nueva planta
                 const newPlantData = {
                     id: result.plant_id, 
                     plant_name: result.plant_name,
                     plant_description: result.plant_description,
                     health_status: result.health_status,
-                    added_date: new Date().toISOString() 
+                    // added_date: new Date().toISOString() // El backend debería devolver esto
                 };
                 renderPlant(newPlantData); 
             }
@@ -168,18 +205,15 @@ async function handleAddPlantFormSubmit(event) {
 function startPlantHealthSimulation() {
     console.log("Iniciando simulación de salud de plantas (ejemplo).");
     setInterval(() => {
-        // Este selector es muy específico, idealmente las plantas tendrían IDs únicos
-        // o una forma de identificar la planta a actualizar.
         const firstPlantItem = document.querySelector('#plants-list-container .plant-item');
         if (firstPlantItem) {
             const healthValueElement = firstPlantItem.querySelector('.health-value');
-            const healthStatusText = firstPlantItem.querySelector('.plant-health .health-label'); // Para actualizar el texto del estado
+            const healthStatusText = firstPlantItem.querySelector('.plant-health .health-label'); 
 
             if (healthValueElement && healthValueElement.textContent.includes('%')) {
                 let currentHealth = parseInt(healthValueElement.textContent);
-                // Simular un cambio pequeño
-                const change = Math.floor(Math.random() * 11) - 5; // -5 a +5
-                currentHealth = Math.max(30, Math.min(100, currentHealth + change)); // Mantener entre 30 y 100
+                const change = Math.floor(Math.random() * 11) - 5; 
+                currentHealth = Math.max(30, Math.min(100, currentHealth + change)); 
                 
                 let newStatus = 'Saludable';
                 let newHealthClass = 'health-good';
@@ -193,15 +227,9 @@ function startPlantHealthSimulation() {
                 }
                 
                 healthValueElement.textContent = currentHealth + '%';
-                healthValueElement.className = `health-value ${newHealthClass}`; // Actualizar clase de color
+                healthValueElement.className = `health-value ${newHealthClass}`; 
                 if(healthStatusText) healthStatusText.textContent = `Salud (${newStatus})`;
-
-                // Actualizar el borde del item
-                firstPlantItem.classList.remove('health-good', 'health-warning', 'health-danger'); // Limpiar clases antiguas del item si se usan para el borde
-                // Y añadir la nueva (esto depende de cómo esté implementado el borde en CSS)
-                // Por ejemplo, si el :before del plant-item depende de la clase en health-value, ya está.
-                // Si no, se necesitaría añadir la clase al plantItem también.
             }
         }
-    }, 20000); // Cada 20 segundos
+    }, 20000); 
 }
