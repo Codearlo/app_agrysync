@@ -1,11 +1,7 @@
 // js/auth.js
 
-const BASE_URL_BACKEND_AUTH = 'backend/'; // Ajusta si tu carpeta backend está en otra ruta
+const BASE_URL_BACKEND_AUTH = 'backend/'; 
 
-/**
- * Maneja el envío del formulario de registro.
- * @param {Event} event - El evento de envío del formulario.
- */
 async function handleRegisterFormSubmit(event) {
     event.preventDefault();
     const form = event.target;
@@ -18,9 +14,8 @@ async function handleRegisterFormSubmit(event) {
         console.error("Elemento de mensaje de registro no encontrado.");
         return;
     }
-
     messageElement.textContent = 'Registrando...';
-    messageElement.className = 'form-message'; // Reset class
+    messageElement.className = 'form-message'; 
 
     try {
         const response = await fetch(`${BASE_URL_BACKEND_AUTH}register_user.php`, {
@@ -29,14 +24,11 @@ async function handleRegisterFormSubmit(event) {
             body: JSON.stringify({ username, email, password })
         });
         const result = await response.json();
-
         if (result.success) {
             messageElement.textContent = result.message + " Serás redirigido al inicio de sesión.";
             messageElement.classList.add('success');
             form.reset();
-            setTimeout(() => {
-                window.location.href = 'login.html'; // Redirigir a la página de login
-            }, 2000);
+            setTimeout(() => { window.location.href = 'login.html'; }, 2000);
         } else {
             messageElement.textContent = result.message || 'Error en el registro.';
             messageElement.classList.add('error');
@@ -48,10 +40,6 @@ async function handleRegisterFormSubmit(event) {
     }
 }
 
-/**
- * Maneja el envío del formulario de inicio de sesión.
- * @param {Event} event - El evento de envío del formulario.
- */
 async function handleLoginFormSubmit(event) {
     event.preventDefault();
     const form = event.target;
@@ -63,9 +51,8 @@ async function handleLoginFormSubmit(event) {
         console.error("Elemento de mensaje de login no encontrado.");
         return;
     }
-
     messageElement.textContent = 'Iniciando sesión...';
-    messageElement.className = 'form-message'; // Reset class
+    messageElement.className = 'form-message'; 
 
     try {
         const response = await fetch(`${BASE_URL_BACKEND_AUTH}login_user.php`, {
@@ -74,15 +61,9 @@ async function handleLoginFormSubmit(event) {
             body: JSON.stringify({ login_identifier, password })
         });
         const result = await response.json();
-
         if (result.success && result.user) {
-            // No mostrar mensaje aquí, la redirección es inmediata
-            // messageElement.textContent = result.message;
-            // messageElement.classList.add('success');
-            
             localStorage.setItem('agroSyncUser', JSON.stringify(result.user));
-            window.location.href = 'index.html'; // Redirigir a la página principal de la app
-            
+            window.location.href = 'index.html'; 
         } else {
             messageElement.textContent = result.message || 'Error en el inicio de sesión.';
             messageElement.classList.add('error');
@@ -94,44 +75,82 @@ async function handleLoginFormSubmit(event) {
     }
 }
 
-/**
- * Cierra la sesión del usuario.
- */
 function logoutUser() {
     localStorage.removeItem('agroSyncUser');
-    window.location.href = 'login.html'; // Redirigir a la página de login
+    updateUIForGuest(); // Actualizar UI al estado de invitado
+    showPage('home'); // O redirigir a login.html si se prefiere: window.location.href = 'login.html';
+    // Si se queda en index.html, la sección de plantas mostrará el prompt de login.
 }
 
-/**
- * Verifica si hay un usuario logueado al cargar la página.
- * @returns {object|null} - El objeto del usuario si está logueado, sino null.
- */
 function checkLoginStatus() {
     const userData = localStorage.getItem('agroSyncUser');
     if (userData) {
-        try {
-            return JSON.parse(userData);
-        } catch (e) {
-            localStorage.removeItem('agroSyncUser'); 
-            return null;
-        }
+        try { return JSON.parse(userData); } 
+        catch (e) { localStorage.removeItem('agroSyncUser'); return null; }
     }
     return null;
 }
 
-/**
- * Actualiza la UI con la información del usuario logueado.
- * Esta función se llamará desde main.js en index.html.
- * @param {object} user - El objeto del usuario.
- */
 function updateUIAfterLogin(user) {
     if (user) {
+        const profileLoggedInContent = document.getElementById('profile-logged-in-content');
+        const profileGuestContent = document.getElementById('profile-guest-content');
         const profileAvatar = document.getElementById('profile-avatar-initials');
         const profileUsername = document.getElementById('profile-username');
         const profileEmail = document.getElementById('profile-email');
+        const plantsLoginPrompt = document.getElementById('plants-login-prompt');
+        const profileStatsGrid = document.getElementById('profile-stats-grid');
+        const profileAchievementsCard = document.getElementById('profile-achievements-card');
+
 
         if (profileAvatar) profileAvatar.textContent = user.username.substring(0, 2).toUpperCase();
         if (profileUsername) profileUsername.textContent = user.username;
         if (profileEmail) profileEmail.textContent = user.email;
+
+        if (profileLoggedInContent) profileLoggedInContent.style.display = 'block';
+        if (profileGuestContent) profileGuestContent.style.display = 'none';
+        if (plantsLoginPrompt) plantsLoginPrompt.style.display = 'none';
+        if (profileStatsGrid) profileStatsGrid.style.display = 'grid'; // o 'block' o el display original
+        if (profileAchievementsCard) profileAchievementsCard.style.display = 'block';
+
+
+        // Actualizar subtítulo del header en la página de perfil
+        const profilePage = document.getElementById('profile');
+        if (profilePage && profilePage.classList.contains('active')) {
+            const headerSubtitleEl = document.getElementById('header-app-subtitle');
+            if (headerSubtitleEl) headerSubtitleEl.textContent = `¡Bienvenido, ${user.username}!`;
+        }
+    }
+}
+
+function updateUIForGuest() {
+    const profileLoggedInContent = document.getElementById('profile-logged-in-content');
+    const profileGuestContent = document.getElementById('profile-guest-content');
+    const plantsLoginPrompt = document.getElementById('plants-login-prompt');
+    const plantsListContainer = document.getElementById('plants-list-container');
+    const profileStatsGrid = document.getElementById('profile-stats-grid');
+    const profileAchievementsCard = document.getElementById('profile-achievements-card');
+
+    if (profileLoggedInContent) profileLoggedInContent.style.display = 'none';
+    if (profileGuestContent) profileGuestContent.style.display = 'block';
+    
+    if (plantsLoginPrompt) plantsLoginPrompt.style.display = 'block';
+    if (plantsListContainer) plantsListContainer.innerHTML = ''; // Limpiar lista de plantas
+    if (plantsListContainer) plantsListContainer.appendChild(plantsLoginPrompt); // Re-añadir el prompt
+
+    if (profileStatsGrid) profileStatsGrid.style.display = 'none';
+    if (profileAchievementsCard) profileAchievementsCard.style.display = 'none';
+
+
+    // Actualizar subtítulo del header en la página de perfil para invitado
+    const profilePage = document.getElementById('profile');
+    if (profilePage && profilePage.classList.contains('active')) {
+         const headerSubtitleEl = document.getElementById('header-app-subtitle');
+         if (headerSubtitleEl) headerSubtitleEl.textContent = "Únete a la comunidad AgroSync";
+    }
+    // Restablecer el subtítulo general del header si se está en otra página
+    const currentPageId = document.querySelector('.page.active')?.id || 'home';
+    if (typeof updateAppHeader === "function" && currentPageId !== 'profile') {
+        updateAppHeader(currentPageId);
     }
 }

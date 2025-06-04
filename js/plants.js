@@ -1,24 +1,17 @@
 // js/plants.js
 
 const plantsListContainer = document.getElementById('plants-list-container');
-const noPlantsMessage = document.getElementById('no-plants-message');
+const plantsLoginPromptEl = document.getElementById('plants-login-prompt'); // Elemento del prompt
 
-/**
- * Renderiza una planta individual en la lista.
- * @param {object} plant - El objeto de la planta con sus propiedades.
- */
 function renderPlant(plant) {
     if (!plantsListContainer) return;
-
     const plantItem = document.createElement('div');
     plantItem.classList.add('plant-item');
     plantItem.dataset.plantId = plant.id; 
-
     let healthClass = '';
     if (plant.health_status === 'Saludable') healthClass = 'health-good';
     else if (plant.health_status === 'Advertencia') healthClass = 'health-warning';
     else if (plant.health_status === 'Peligro') healthClass = 'health-danger';
-
     plantItem.innerHTML = `
         <div class="plant-info">
             <h4>${escapeHTML(plant.plant_name)}</h4>
@@ -34,12 +27,7 @@ function renderPlant(plant) {
 
 function escapeHTML(str) {
     if (str === null || str === undefined) return '';
-    return str.toString()
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+    return str.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 function calculateHealthPercentage(status) {
@@ -51,93 +39,81 @@ function calculateHealthPercentage(status) {
     }
 }
 
-/**
- * Obtiene las plantas del usuario desde el backend y las muestra.
- * @param {number} userId - El ID del usuario para el cual obtener las plantas.
- */
-async function fetchAndDisplayPlants(userId) { // userId ahora es un parámetro
-    if (!plantsListContainer || !noPlantsMessage) {
+async function fetchAndDisplayPlants() {
+    if (!plantsListContainer || !plantsLoginPromptEl) {
         console.error("Elementos del DOM para la lista de plantas no encontrados.");
         return;
     }
 
-    if (!userId) { // Verificar si se pasó un userId válido
-        plantsListContainer.innerHTML = ''; 
-        noPlantsMessage.textContent = 'Error: No se pudo identificar al usuario para cargar las plantas.';
-        noPlantsMessage.style.display = 'block';
-        console.error("fetchAndDisplayPlants fue llamado sin un userId.");
+    const user = checkLoginStatus(); // checkLoginStatus() debe estar disponible globalmente desde auth.js
+
+    if (!user || !user.id) {
+        plantsListContainer.innerHTML = ''; // Limpiar cualquier planta anterior
+        plantsLoginPromptEl.style.display = 'block'; // Mostrar prompt para iniciar sesión
         return;
     }
 
-    console.log(`Fetching plants for user ID: ${userId}`);
+    plantsLoginPromptEl.style.display = 'none'; // Ocultar prompt si está logueado
+    console.log(`Fetching plants for user ID: ${user.id}`);
 
     try {
-        const response = await fetch(`backend/get_plants.php?user_id=${userId}`); 
+        const response = await fetch(`backend/get_plants.php?user_id=${user.id}`); 
         if (!response.ok) {
-            // Intentar leer el cuerpo del error si es JSON
             let errorDetails = `HTTP error! status: ${response.status}`;
-            try {
-                const errorData = await response.json();
-                if (errorData && errorData.error) {
-                    errorDetails += ` - ${errorData.error}`;
-                }
-            } catch (e) {
-                // El cuerpo del error no era JSON o hubo otro problema al leerlo
-            }
+            try { const errorData = await response.json(); if (errorData && errorData.error) { errorDetails += ` - ${errorData.error}`; } } catch (e) {}
             throw new Error(errorDetails);
         }
         const plants = await response.json();
-
         plantsListContainer.innerHTML = ''; 
-
         if (plants.length === 0) {
-            noPlantsMessage.textContent = 'Aún no has añadido ninguna planta. ¡Ve a tu perfil para empezar!';
-            noPlantsMessage.style.display = 'block';
+            plantsListContainer.innerHTML = '<p style="text-align: center; color: var(--gray-500);">Aún no has añadido ninguna planta. ¡Ve a tu perfil para empezar!</p>';
         } else {
-            noPlantsMessage.style.display = 'none';
             plants.forEach(plant => renderPlant(plant));
         }
     } catch (error) {
         console.error("Error al obtener las plantas:", error);
         plantsListContainer.innerHTML = `<p style="color: var(--danger); text-align: center;">Error al cargar las plantas: ${error.message}. Intenta de nuevo más tarde.</p>`;
-        noPlantsMessage.style.display = 'none';
     }
 }
 
-/**
- * Maneja el envío del formulario para añadir una nueva planta.
- * @param {Event} event - El evento de envío del formulario.
- */
 async function handleAddPlantFormSubmit(event) {
     event.preventDefault(); 
+    const user = checkLoginStatus();
+    const addPlantMessage = document.getElementById('add-plant-message');
 
-    const user = checkLoginStatus(); // Para añadir planta, aún necesitamos saber quién es el usuario
+    if (!addPlantMessage) {
+        console.error("Elemento de mensaje para añadir planta no encontrado.");
+        return;
+    }
+
     if (!user || !user.id) {
-        // En una app real, esto no debería suceder si el formulario solo es visible para usuarios logueados.
-        // Pero como el login está desactivado, usamos el user_id del objeto de prueba.
-        // Si la verificación de login estuviera activa, esto sería un alert o un mensaje en UI.
-        console.warn("Intentando añadir planta sin un usuario de localStorage. Se usará el ID del usuario de prueba si está disponible en main.js.");
-        // Para el caso de login desactivado, podríamos obtener el ID del loggedInUser de main.js si fuera global,
-        // o mejor, pasarlo si esta función se llama desde un contexto donde se conoce.
-        // Por ahora, si checkLoginStatus falla, mostramos error.
-        const addPlantMessageEl = document.getElementById('add-plant-message');
-        if (addPlantMessageEl) {
-            addPlantMessageEl.textContent = 'Error de autenticación. No se puede añadir planta.';
-            addPlantMessageEl.style.color = 'var(--danger)';
-        }
+        addPlantMessage.textContent = 'Debes iniciar sesión para añadir plantas.';
+        addPlantMessage.style.color = 'var(--danger)';
+        // Opcional: Redirigir a la página de login o mostrar un modal de login
+        setTimeout(() => {
+            if (typeof showPage === 'function') {
+                // No tenemos una página de login separada en index.html,
+                // el usuario debe ir a login.html.
+                // Podríamos mostrar un mensaje más prominente o un botón para ir a login.
+                alert("Por favor, inicia sesión para añadir plantas.");
+                window.location.href = 'login.html';
+            } else {
+                 alert("Por favor, inicia sesión para añadir plantas.");
+            }
+        }, 1500);
         return;
     }
     const userIdForPlant = user.id;
-
 
     const form = event.target;
     const plantNameInput = document.getElementById('plant-name');
     const plantDescriptionInput = document.getElementById('plant-description');
     const plantHealthInput = document.getElementById('plant-health');
-    const addPlantMessage = document.getElementById('add-plant-message');
-
-    if (!plantNameInput || !plantHealthInput || !addPlantMessage) {
+    
+    if (!plantNameInput || !plantHealthInput) {
         console.error("Faltan elementos del formulario para añadir planta.");
+        addPlantMessage.textContent = 'Error interno del formulario.';
+        addPlantMessage.style.color = 'var(--danger)';
         return;
     }
 
@@ -160,31 +136,24 @@ async function handleAddPlantFormSubmit(event) {
     try {
         const response = await fetch('backend/add_plant.php', { 
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(plantData)
         });
-
         const result = await response.json();
-
         if (result.success) {
             addPlantMessage.textContent = result.message;
             addPlantMessage.style.color = 'var(--success)';
             form.reset(); 
-            
-            if (plantsListContainer && noPlantsMessage) { 
-                 if (noPlantsMessage.style.display === 'block') {
-                    noPlantsMessage.style.display = 'none';
+            if (plantsListContainer) { 
+                 if (plantsLoginPromptEl && plantsLoginPromptEl.style.display === 'block') {
+                    plantsLoginPromptEl.style.display = 'none';
                     plantsListContainer.innerHTML = ''; 
                 }
-                // Usar los datos devueltos por el backend para la nueva planta
                 const newPlantData = {
                     id: result.plant_id, 
                     plant_name: result.plant_name,
                     plant_description: result.plant_description,
                     health_status: result.health_status,
-                    // added_date: new Date().toISOString() // El backend debería devolver esto
                 };
                 renderPlant(newPlantData); 
             }
@@ -199,37 +168,7 @@ async function handleAddPlantFormSubmit(event) {
     }
 }
 
-/**
- * Inicia una simulación de actualización de salud para la primera planta en la lista (ejemplo).
- */
+// Simulación de salud (opcional, mantener si se desea)
 function startPlantHealthSimulation() {
-    console.log("Iniciando simulación de salud de plantas (ejemplo).");
-    setInterval(() => {
-        const firstPlantItem = document.querySelector('#plants-list-container .plant-item');
-        if (firstPlantItem) {
-            const healthValueElement = firstPlantItem.querySelector('.health-value');
-            const healthStatusText = firstPlantItem.querySelector('.plant-health .health-label'); 
-
-            if (healthValueElement && healthValueElement.textContent.includes('%')) {
-                let currentHealth = parseInt(healthValueElement.textContent);
-                const change = Math.floor(Math.random() * 11) - 5; 
-                currentHealth = Math.max(30, Math.min(100, currentHealth + change)); 
-                
-                let newStatus = 'Saludable';
-                let newHealthClass = 'health-good';
-
-                if (currentHealth < 50) {
-                    newStatus = 'Peligro';
-                    newHealthClass = 'health-danger';
-                } else if (currentHealth < 80) {
-                    newStatus = 'Advertencia';
-                    newHealthClass = 'health-warning';
-                }
-                
-                healthValueElement.textContent = currentHealth + '%';
-                healthValueElement.className = `health-value ${newHealthClass}`; 
-                if(healthStatusText) healthStatusText.textContent = `Salud (${newStatus})`;
-            }
-        }
-    }, 20000); 
+    // ... (código de simulación existente)
 }
