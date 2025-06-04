@@ -14,21 +14,15 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar conexión
 if ($conn->connect_error) {
-    // No uses die() en una API real, mejor devuelve un JSON de error
-    // Para este ejemplo, lo mantenemos simple
-    error_log("Connection failed: " . $conn->connect_error); // Log del error
-    http_response_code(500); // Internal Server Error
-    echo json_encode(["error" => "Database connection failed. Please check server logs."]);
-    exit(); // Detener la ejecución
+    error_log("Connection failed: " . $conn->connect_error);
+    http_response_code(500); 
+    echo json_encode(["error" => "Database connection failed."]); // Mensaje más genérico para el cliente
+    exit();
 }
 
-// Establecer el charset a utf8mb4 para soportar emojis y caracteres especiales
 if (!$conn->set_charset("utf8mb4")) {
     error_log("Error loading character set utf8mb4: " . $conn->error);
-}
-
-// Opcional: Manejar solicitudes OPTIONS para CORS preflight
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    exit(0);
+    // No es necesario salir aquí, pero es bueno loguearlo
 }
 ?>
+

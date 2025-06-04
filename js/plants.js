@@ -12,7 +12,7 @@ function renderPlant(plant) {
 
     const plantItem = document.createElement('div');
     plantItem.classList.add('plant-item');
-    // Puedes añadir un ID único si necesitas referenciarlo después, ej: plantItem.dataset.plantId = plant.id;
+    plantItem.dataset.plantId = plant.id; // Guardar ID para futuras acciones (editar/borrar)
 
     let healthClass = '';
     if (plant.health_status === 'Saludable') healthClass = 'health-good';
@@ -29,16 +29,9 @@ function renderPlant(plant) {
             <div class="health-label">Salud (${escapeHTML(plant.health_status)})</div>
         </div>
     `;
-    // Prepend para que las nuevas plantas aparezcan arriba (opcional)
-    // plantsListContainer.prepend(plantItem); 
-    plantsListContainer.appendChild(plantItem); // Append para orden normal
+    plantsListContainer.appendChild(plantItem);
 }
 
-/**
- * Escapa caracteres HTML para prevenir XSS.
- * @param {string} str - La cadena a escapar.
- * @returns {string} - La cadena escapada.
- */
 function escapeHTML(str) {
     if (str === null || str === undefined) return '';
     return str.toString()
@@ -49,20 +42,14 @@ function escapeHTML(str) {
         .replace(/'/g, '&#039;');
 }
 
-/**
- * Calcula un porcentaje de salud basado en el estado (ejemplo).
- * @param {string} status - El estado de salud ("Saludable", "Advertencia", "Peligro").
- * @returns {number} - Un porcentaje.
- */
 function calculateHealthPercentage(status) {
     switch (status) {
-        case 'Saludable': return Math.floor(Math.random() * 11) + 90; // 90-100%
-        case 'Advertencia': return Math.floor(Math.random() * 20) + 70; // 70-89%
-        case 'Peligro': return Math.floor(Math.random() * 30) + 40; // 40-69%
+        case 'Saludable': return Math.floor(Math.random() * 11) + 90;
+        case 'Advertencia': return Math.floor(Math.random() * 20) + 70;
+        case 'Peligro': return Math.floor(Math.random() * 30) + 40;
         default: return 50;
     }
 }
-
 
 /**
  * Obtiene las plantas del usuario desde el backend y las muestra.
@@ -70,16 +57,26 @@ function calculateHealthPercentage(status) {
 async function fetchAndDisplayPlants() {
     if (!plantsListContainer || !noPlantsMessage) return;
 
+    const user = checkLoginStatus(); // Obtener usuario logueado
+    if (!user || !user.id) {
+        plantsListContainer.innerHTML = ''; // Limpiar por si acaso
+        noPlantsMessage.textContent = 'Inicia sesión para ver tus plantas.';
+        noPlantsMessage.style.display = 'block';
+        return;
+    }
+
     try {
-        const response = await fetch('backend/get_plants.php'); // Asegúrate que la ruta sea correcta
+        // Pasar user_id al backend
+        const response = await fetch(`backend/get_plants.php?user_id=${user.id}`); 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const plants = await response.json();
 
-        plantsListContainer.innerHTML = ''; // Limpiar lista actual
+        plantsListContainer.innerHTML = ''; 
 
         if (plants.length === 0) {
+            noPlantsMessage.textContent = 'Aún no has añadido ninguna planta. ¡Ve a tu perfil para empezar!';
             noPlantsMessage.style.display = 'block';
         } else {
             noPlantsMessage.style.display = 'none';
@@ -97,7 +94,13 @@ async function fetchAndDisplayPlants() {
  * @param {Event} event - El evento de envío del formulario.
  */
 async function handleAddPlantFormSubmit(event) {
-    event.preventDefault(); // Prevenir el envío tradicional del formulario
+    event.preventDefault(); 
+
+    const user = checkLoginStatus();
+    if (!user || !user.id) {
+        alert("Debes iniciar sesión para añadir plantas."); // O mostrar mensaje en UI
+        return;
+    }
 
     const form = event.target;
     const plantNameInput = document.getElementById('plant-name');
@@ -111,6 +114,7 @@ async function handleAddPlantFormSubmit(event) {
     }
 
     const plantData = {
+        user_id: user.id, // Añadir user_id
         plant_name: plantNameInput.value.trim(),
         plant_description: plantDescriptionInput.value.trim(),
         health_status: plantHealthInput.value
@@ -126,7 +130,7 @@ async function handleAddPlantFormSubmit(event) {
     addPlantMessage.style.color = 'var(--gray-500)';
 
     try {
-        const response = await fetch('backend/add_plant.php', { // Asegúrate que la ruta sea correcta
+        const response = await fetch('backend/add_plant.php', { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -139,26 +143,23 @@ async function handleAddPlantFormSubmit(event) {
         if (result.success) {
             addPlantMessage.textContent = result.message;
             addPlantMessage.style.color = 'var(--success)';
-            form.reset(); // Limpiar el formulario
-            // Actualizar la lista de plantas en la página de inicio
-            // Podríamos solo añadir la nueva planta a la UI o recargar todo
-            if (plantsListContainer && noPlantsMessage) { // Si estamos en la página de inicio o la lógica de renderizado es global
+            form.reset(); 
+            
+            // Actualizar la lista de plantas inmediatamente
+            if (plantsListContainer && noPlantsMessage) { 
                  if (noPlantsMessage.style.display === 'block') {
                     noPlantsMessage.style.display = 'none';
-                    plantsListContainer.innerHTML = ''; // Limpiar mensaje "no hay plantas"
+                    plantsListContainer.innerHTML = ''; 
                 }
-                // Crear un objeto planta simulado con los datos devueltos para añadirlo a la UI
                 const newPlantData = {
-                    id: result.plant_id, // Asumiendo que el backend devuelve el ID
+                    id: result.plant_id, 
                     plant_name: result.plant_name,
                     plant_description: result.plant_description,
                     health_status: result.health_status,
-                    added_date: new Date().toISOString() // Simular fecha
+                    added_date: new Date().toISOString() 
                 };
-                renderPlant(newPlantData); // Añadir la nueva planta a la lista
+                renderPlant(newPlantData); 
             }
-            // O, más simple pero menos eficiente si hay muchas plantas:
-            // fetchAndDisplayPlants(); 
         } else {
             addPlantMessage.textContent = result.message || 'Error al guardar la planta.';
             addPlantMessage.style.color = 'var(--danger)';

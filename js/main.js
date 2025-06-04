@@ -1,15 +1,38 @@
 // js/main.js
 
-// Importar funciones de Firebase (si usas módulos y los SDKs de Firebase)
-// Para este ejemplo, asumiremos que los scripts de Firebase se cargan globalmente
-// o que las funciones de Firebase estarán disponibles cuando se necesiten.
-// Si usas módulos, harías algo como:
-// import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-// import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-// import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
 document.addEventListener('DOMContentLoaded', function() {
+    // --- INICIALIZACIÓN DE AUTENTICACIÓN ---
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const logoutButton = document.getElementById('logout-btn');
+    const bottomNav = document.querySelector('.bottom-nav');
+
+    if (loginForm && typeof handleLoginFormSubmit === 'function') {
+        loginForm.addEventListener('submit', handleLoginFormSubmit);
+    }
+    if (registerForm && typeof handleRegisterFormSubmit === 'function') {
+        registerForm.addEventListener('submit', handleRegisterFormSubmit);
+    }
+    if (logoutButton && typeof logoutUser === 'function') {
+        logoutButton.addEventListener('click', logoutUser);
+    }
+
+    // Verificar estado de login al cargar
+    const loggedInUser = checkLoginStatus();
+    if (loggedInUser) {
+        updateUIAfterLogin(loggedInUser);
+        if (bottomNav) bottomNav.style.display = 'flex';
+        showPage('home'); // Mostrar home si está logueado
+        if (typeof fetchAndDisplayPlants === 'function') {
+            fetchAndDisplayPlants(); // Cargar plantas del usuario
+        }
+    } else {
+        if (bottomNav) bottomNav.style.display = 'none'; // Ocultar nav si no está logueado
+        showPage('login'); // Mostrar login si no está logueado
+    }
+
     // --- INICIALIZACIÓN DEL MODO OSCURO ---
+    // (código de modo oscuro existente)
     const savedDarkMode = localStorage.getItem('darkMode');
     const darkModeToggleContainer = document.getElementById('darkModeToggleContainer');
     const darkModeCheckbox = document.getElementById('darkModeToggle'); 
@@ -87,46 +110,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- FUNCIONALIDAD DE PLANTAS ---
+    // --- FUNCIONALIDAD DE PLANTAS (YA INCLUIDA EN LA LÓGICA DE AUTH) ---
     const addPlantForm = document.getElementById('add-plant-form');
     if (addPlantForm && typeof handleAddPlantFormSubmit === 'function') {
         addPlantForm.addEventListener('submit', handleAddPlantFormSubmit);
     }
-
-    // Cargar plantas al iniciar la app (si la función está disponible)
-    if (typeof fetchAndDisplayPlants === 'function') {
-        fetchAndDisplayPlants();
-    }
     
-    // --- MOSTRAR PÁGINA INICIAL ---
-    if (typeof showPage === 'function') {
-        showPage('home'); 
-    }
-
-    // --- SIMULACIÓN DE ACTUALIZACIÓN DE SALUD DE PLANTA (EJEMPLO) ---
-    // Este es un ejemplo y puede no ser necesario si la salud se maneja desde la BD
-    // setInterval(() => {
-    //     const healthElement = document.querySelector('#home .plant-item:first-child .health-value');
-    //     if (healthElement && healthElement.textContent.includes('%')) {
-    //         let currentHealth = parseInt(healthElement.textContent);
-    //         currentHealth = Math.max(60, Math.min(99, currentHealth + (Math.floor(Math.random() * 7) - 3)));
-    //         healthElement.textContent = currentHealth + '%';
-    //         const parentItem = healthElement.closest('.plant-item');
-    //         if (parentItem) {
-    //             parentItem.classList.remove('health-good', 'health-warning', 'health-danger');
-    //             healthElement.classList.remove('health-good', 'health-warning', 'health-danger');
-                
-    //             if (currentHealth < 75) {
-    //                 healthElement.classList.add('health-danger');
-    //             } else if (currentHealth < 90) {
-    //                 healthElement.classList.add('health-warning');
-    //             } else {
-    //                 healthElement.classList.add('health-good');
-    //             }
-    //         }
-    //     }
-    // }, 15000);
-
     // --- FEEDBACK TÁCTIL VISUAL ---
     document.querySelectorAll('button, .nav-item, .action-btn, .toggle-switch').forEach(element => {
         element.addEventListener('touchstart', function() {
@@ -137,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- CONFIGURACIÓN DE INTERRUPTORES GENÉRICOS (NO DARK MODE/LOCATION) ---
+    // --- CONFIGURACIÓN DE INTERRUPTORES GENÉRICOS ---
     document.querySelectorAll('.toggle-switch').forEach(toggle => {
         if(toggle.id === 'darkModeToggleContainer' || toggle.id === 'locationToggleContainer') return;
 
