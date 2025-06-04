@@ -121,7 +121,6 @@ function showPage(pageId) {
         
         const currentNotificationBadge = document.getElementById('header-notification-badge');
         const currentNotificationCount = currentNotificationBadge ? parseInt(currentNotificationBadge.textContent) : 0;
-        // Asegurarse que updateAppHeader se llame incluso si currentNotificationCount es NaN
         updateAppHeader(pageId, isNaN(currentNotificationCount) ? 0 : currentNotificationCount);
     } else {
         console.warn(`UI WARNING: Página con ID '${pageId}' no encontrada en el DOM.`);
@@ -149,34 +148,33 @@ function initializeDarkMode() {
     const darkModeCheckbox = document.getElementById('darkModeToggle'); 
 
     if (!darkModeToggleContainer || !darkModeCheckbox) {
-        console.warn("UI WARNING: Elementos para el toggle de modo oscuro no encontrados.");
+        console.warn("UI WARNING: Elementos para el toggle de modo oscuro no encontrados durante la inicialización.");
         return;
     }
 
     if (savedDarkMode === 'enabled') {
-        document.body.classList.add('dark-mode');
+        if (document.body) document.body.classList.add('dark-mode');
         darkModeToggleContainer.classList.add('active');
         darkModeCheckbox.checked = true;
     } else {
-        document.body.classList.remove('dark-mode'); // Asegurar que no esté si no está enabled
+        if (document.body) document.body.classList.remove('dark-mode');
         darkModeToggleContainer.classList.remove('active');
         darkModeCheckbox.checked = false;
     }
-    
-    // El event listener se añade en main.js para asegurar que toggleDarkMode esté definida.
-    // Si se mueve aquí, asegurarse que toggleDarkMode esté definida antes.
 }
 
 /**
  * Alterna el modo oscuro en la aplicación.
  */
 function toggleDarkMode() {
-    if (!document.body || !document.body.classList) {
+    const body = document.body; // Guardar referencia
+    if (!body || !body.classList) {
         console.error("UI ERROR: document.body o document.body.classList no está disponible en toggleDarkMode.");
         return;
     }
-    document.body.classList.toggle('dark-mode');
-    const isDarkMode = document.body.classList.contains('dark-mode');
+
+    body.classList.toggle('dark-mode');
+    const isDarkMode = body.classList.contains('dark-mode');
     localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
     
     const darkModeToggleContainer = document.getElementById('darkModeToggleContainer');
@@ -189,13 +187,13 @@ function toggleDarkMode() {
             darkModeToggleContainer.classList.remove('active');
         }
     } else {
-        console.warn("UI WARNING: Contenedor del toggle de modo oscuro no encontrado en toggleDarkMode.");
+        console.warn("UI WARNING: Contenedor del toggle de modo oscuro (#darkModeToggleContainer) no encontrado en toggleDarkMode.");
     }
 
      if(darkModeCheckbox) {
         darkModeCheckbox.checked = isDarkMode;
     } else {
-        console.warn("UI WARNING: Checkbox del toggle de modo oscuro no encontrado en toggleDarkMode.");
+        console.warn("UI WARNING: Checkbox del toggle de modo oscuro (#darkModeToggle) no encontrado en toggleDarkMode.");
     }
 }
 
@@ -216,8 +214,6 @@ function initializeLocationToggle() {
     } else {
         locationToggleContainer.classList.remove('active');
     }
-
-    // El event listener se añade en main.js
 }
 
 /**
@@ -245,7 +241,5 @@ function initializeGenericToggles() {
         if (checkbox && checkbox.checked) {
             toggle.classList.add('active');
         }
-
-        // El event listener se añade en main.js
     });
 }
