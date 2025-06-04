@@ -1,27 +1,21 @@
 // js/main.js
 
 document.addEventListener('DOMContentLoaded', async function() { 
-    console.log("DOM completamente cargado y parseado.");
+    console.log("DOM completamente cargado y parseado. Iniciando AgroSync main.js...");
 
     // --- VERIFICACIÓN DE AUTENTICACIÓN (TEMPORALMENTE DESACTIVADA) ---
-    // const loggedInUser = checkLoginStatus(); 
-    // const mainAppHeaderContainer = document.getElementById('main-app-header');
-    // const mainBottomNavContainer = document.getElementById('main-bottom-nav');
-
-    // if (!loggedInUser) {
-    //     console.log("Usuario no logueado. Redirigiendo a login.html (VERIFICACIÓN DESACTIVADA)");
-    //     // window.location.href = 'login.html'; // Desactivado para desarrollo
-    //     // return; 
-    // }
-    // console.log("Usuario (simulado o real si la verificación estuviera activa):", loggedInUser);
-
-    // Asumimos que hay un usuario para propósitos de desarrollo sin login
     const loggedInUser = { id: 1, username: "DevUser", email: "dev@example.com" }; // Usuario de prueba
     console.log("VERIFICACIÓN DE LOGIN DESACTIVADA. Usando usuario de prueba:", loggedInUser);
 
     const mainAppHeaderContainer = document.getElementById('main-app-header');
     const mainBottomNavContainer = document.getElementById('main-bottom-nav');
+    const appContainer = document.querySelector('.app-container'); 
 
+    if (!mainAppHeaderContainer || !mainBottomNavContainer || !appContainer) {
+        console.error("Error crítico: Faltan contenedores principales (#main-app-header, #main-bottom-nav, o .app-container). Verifica tu index.html.");
+        document.body.innerHTML = "<p style='color:red; font-size:18px; text-align:center; padding:20px;'>Error crítico: Faltan elementos base de la aplicación. Revisa la consola.</p>";
+        return;
+    }
 
     // Cargar componentes dinámicos de la UI (header y navegación)
     let headerContentLoaded = false;
@@ -42,17 +36,25 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error("Función loadBottomNavigationStructure no definida (debería estar en ui.js).");
     }
 
-    // Mostrar mensajes de error si la carga falla
-    if (!headerContentLoaded && mainAppHeaderContainer) {
-        mainAppHeaderContainer.innerHTML = "<div class='header-content' style='padding: 1rem; text-align: center; color: white;'><p>Error al cargar el header. Verifica la consola.</p></div>";
-    }
-    if (!bottomNavContentLoaded && mainBottomNavContainer) {
-        mainBottomNavContainer.innerHTML = "<p style='text-align:center; padding:0.5rem; width:100%; color: var(--danger);'>Error al cargar navegación.</p>";
-        // Aunque falle la carga del contenido de la nav, intentamos mostrar el contenedor si existe
-        mainBottomNavContainer.style.display = 'flex'; 
+    // Si alguno de los componentes esenciales no se cargó, mostrar un error y no continuar con la UI principal.
+    if (!headerContentLoaded || !bottomNavContentLoaded) {
+        console.error("FALLO CRÍTICO: El header o la navegación inferior no se pudieron cargar. La aplicación no se mostrará correctamente.");
+        if (!headerContentLoaded && mainAppHeaderContainer) {
+            mainAppHeaderContainer.innerHTML = "<div class='header-content' style='padding: 1rem; text-align: center; color: white;'><p>Error al cargar el header. Verifica la consola (Network tab para 'includes/app_header.html').</p></div>";
+        }
+        if (!bottomNavContentLoaded && mainBottomNavContainer) {
+            mainBottomNavContainer.innerHTML = "<p style='text-align:center; padding:0.5rem; width:100%; color: var(--danger);'>Error al cargar navegación. Verifica la consola (Network tab para 'includes/bottom_navigation.html').</p>";
+            mainBottomNavContainer.style.display = 'flex'; 
+        }
+        // Ocultar el resto de las páginas si los componentes base fallan
+        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+        if(mainBottomNavContainer && !bottomNavContentLoaded) mainBottomNavContainer.style.display = 'none'; // Ocultar nav si su contenido falló
+        return; // Detener la inicialización de la UI principal
     }
     
-    // Actualizar UI con datos del usuario (ahora usa el usuario de prueba)
+    console.log("Header y Navegación cargados o intento de carga completado.");
+
+    // Actualizar UI con datos del usuario
     if (typeof updateUIAfterLogin === 'function') {
         updateUIAfterLogin(loggedInUser); 
     } else {
@@ -60,10 +62,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // Mostrar navegación y página de inicio
-    // Se asume que si la verificación de login está desactivada, queremos ver la app principal
-    if (mainBottomNavContainer) { // Mostrar la barra de navegación siempre si la verificación está desactivada
+    if (mainBottomNavContainer) {
         mainBottomNavContainer.style.display = 'flex'; 
-        console.log("Barra de navegación inferior establecida a display:flex (login check desactivado).");
+        console.log("Barra de navegación inferior establecida a display:flex.");
     }
     
     if (typeof showPage === 'function') {
@@ -73,7 +74,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error("Función showPage no definida (debería estar en ui.js).");
     }
     
-
     // Cargar datos específicos de la aplicación
     if (typeof fetchAndDisplayPlants === 'function') {
         fetchAndDisplayPlants(); 
@@ -103,11 +103,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         addPlantForm.addEventListener('submit', handleAddPlantFormSubmit);
     }
 
-    // Inicializar chat del asistente
     if (typeof initializeAssistantChat === 'function') { 
         initializeAssistantChat();
     } else {
-        // Lógica anterior para inicializar el chat si no hay una función dedicada
         if (typeof addMessageToChat === 'function' && typeof getGeminiResponse === 'function') { 
             const assistantPage = document.getElementById('assistant');
             if (assistantPage) { 
@@ -135,7 +133,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
     
-    // --- INICIALIZACIONES DE UI GENERALES ---
     if (typeof initializeDarkMode === 'function') {
         initializeDarkMode();
     } else {
@@ -160,7 +157,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error("Función initializeGenericToggles no definida (debería estar en ui.js).");
     }
 
-    // --- SIMULACIÓN (OPCIONAL) ---
     if (typeof startPlantHealthSimulation === 'function') {
         // startPlantHealthSimulation(); 
     }
