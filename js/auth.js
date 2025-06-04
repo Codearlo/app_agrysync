@@ -1,6 +1,6 @@
 // js/auth.js
 
-const BASE_URL_BACKEND = 'backend/'; // Ajusta si tu carpeta backend está en otra ruta
+const BASE_URL_BACKEND_AUTH = 'backend/'; // Ajusta si tu carpeta backend está en otra ruta
 
 /**
  * Maneja el envío del formulario de registro.
@@ -14,11 +14,16 @@ async function handleRegisterFormSubmit(event) {
     const password = form.elements['register-password'].value;
     const messageElement = document.getElementById('register-message');
 
+    if (!messageElement) {
+        console.error("Elemento de mensaje de registro no encontrado.");
+        return;
+    }
+
     messageElement.textContent = 'Registrando...';
     messageElement.className = 'form-message'; // Reset class
 
     try {
-        const response = await fetch(`${BASE_URL_BACKEND}register_user.php`, {
+        const response = await fetch(`${BASE_URL_BACKEND_AUTH}register_user.php`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password })
@@ -30,7 +35,7 @@ async function handleRegisterFormSubmit(event) {
             messageElement.classList.add('success');
             form.reset();
             setTimeout(() => {
-                showPage('login'); // Asume que showPage está definida globalmente (en ui.js)
+                window.location.href = 'login.html'; // Redirigir a la página de login
             }, 2000);
         } else {
             messageElement.textContent = result.message || 'Error en el registro.';
@@ -54,11 +59,16 @@ async function handleLoginFormSubmit(event) {
     const password = form.elements['login-password'].value;
     const messageElement = document.getElementById('login-message');
 
+    if (!messageElement) {
+        console.error("Elemento de mensaje de login no encontrado.");
+        return;
+    }
+
     messageElement.textContent = 'Iniciando sesión...';
     messageElement.className = 'form-message'; // Reset class
 
     try {
-        const response = await fetch(`${BASE_URL_BACKEND}login_user.php`, {
+        const response = await fetch(`${BASE_URL_BACKEND_AUTH}login_user.php`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ login_identifier, password })
@@ -66,17 +76,13 @@ async function handleLoginFormSubmit(event) {
         const result = await response.json();
 
         if (result.success && result.user) {
-            messageElement.textContent = result.message;
-            messageElement.classList.add('success');
+            // No mostrar mensaje aquí, la redirección es inmediata
+            // messageElement.textContent = result.message;
+            // messageElement.classList.add('success');
             
-            // Guardar información del usuario en localStorage
             localStorage.setItem('agroSyncUser', JSON.stringify(result.user));
+            window.location.href = 'index.html'; // Redirigir a la página principal de la app
             
-            // Actualizar UI y redirigir
-            updateUIAfterLogin(result.user);
-            showPage('home'); // Asume que showPage está definida globalmente (en ui.js)
-            document.querySelector('.bottom-nav').style.display = 'flex'; // Mostrar nav
-            fetchAndDisplayPlants(); // Cargar plantas del usuario logueado
         } else {
             messageElement.textContent = result.message || 'Error en el inicio de sesión.';
             messageElement.classList.add('error');
@@ -93,15 +99,7 @@ async function handleLoginFormSubmit(event) {
  */
 function logoutUser() {
     localStorage.removeItem('agroSyncUser');
-    // Limpiar UI y redirigir a login
-    document.getElementById('profile-avatar-initials').textContent = '--';
-    document.getElementById('profile-username').textContent = 'Nombre de Usuario';
-    document.getElementById('profile-email').textContent = 'correo@ejemplo.com';
-    document.getElementById('plants-list-container').innerHTML = '<p id="no-plants-message" style="text-align: center; color: var(--gray-500);">Inicia sesión para ver tus plantas.</p>';
-
-
-    showPage('login');
-    document.querySelector('.bottom-nav').style.display = 'none'; // Ocultar nav
+    window.location.href = 'login.html'; // Redirigir a la página de login
 }
 
 /**
@@ -114,7 +112,7 @@ function checkLoginStatus() {
         try {
             return JSON.parse(userData);
         } catch (e) {
-            localStorage.removeItem('agroSyncUser'); // Datos corruptos
+            localStorage.removeItem('agroSyncUser'); 
             return null;
         }
     }
@@ -123,14 +121,17 @@ function checkLoginStatus() {
 
 /**
  * Actualiza la UI con la información del usuario logueado.
+ * Esta función se llamará desde main.js en index.html.
  * @param {object} user - El objeto del usuario.
  */
 function updateUIAfterLogin(user) {
     if (user) {
-        document.getElementById('profile-avatar-initials').textContent = user.username.substring(0, 2).toUpperCase();
-        document.getElementById('profile-username').textContent = user.username;
-        document.getElementById('profile-email').textContent = user.email;
-        // Aquí podrías cambiar el texto del subtítulo del perfil si lo deseas
-        // document.getElementById('profile-subtitle').textContent = `Bienvenido, ${user.username}`;
+        const profileAvatar = document.getElementById('profile-avatar-initials');
+        const profileUsername = document.getElementById('profile-username');
+        const profileEmail = document.getElementById('profile-email');
+
+        if (profileAvatar) profileAvatar.textContent = user.username.substring(0, 2).toUpperCase();
+        if (profileUsername) profileUsername.textContent = user.username;
+        if (profileEmail) profileEmail.textContent = user.email;
     }
 }

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Iniciar Sesión - AgroSync</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/auth.css"> <!-- Estilos específicos para autenticación -->
+    <link rel="stylesheet" href="css/dark_mode.css">
+    <link rel="stylesheet" href="css/responsive_utilities.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <main class="main-content auth-content">
+            <div class="auth-card card">
+                <div class="page-header">
+                    <h2><i class="fas fa-sign-in-alt"></i> Iniciar Sesión en AgroSync</h2>
+                    <p>Accede a tu jardín inteligente.</p>
+                </div>
+                <form id="login-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="login-identifier">Usuario o Correo Electrónico:</label>
+                        <input type="text" id="login-identifier" name="login_identifier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Contraseña:</label>
+                        <input type="password" id="login-password" name="login_password" required>
+                    </div>
+                    <button type="submit" class="action-btn primary" style="width: 100%; margin-top: 1.5rem;">
+                        <i class="fas fa-paper-plane"></i> Ingresar
+                    </button>
+                </form>
+                <div id="login-message" class="form-message" style="margin-top: 1rem;"></div>
+                <p class="auth-switch">¿No tienes cuenta? <a href="register.html">Regístrate aquí</a></p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts necesarios para esta página -->
+    <script src="js/auth.js"></script> 
+    <script>
+        // Adjuntar event listener específico para esta página
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('login-form');
+            if (loginForm && typeof handleLoginFormSubmit === 'function') {
+                loginForm.addEventListener('submit', handleLoginFormSubmit);
+            }
+
+            // Verificar si el usuario ya está logueado y redirigir a index.html si es así
+            const loggedInUser = checkLoginStatus(); // Asume que checkLoginStatus está en auth.js
+            if (loggedInUser) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

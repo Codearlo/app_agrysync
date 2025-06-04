@@ -1,38 +1,46 @@
 // js/main.js
 
 document.addEventListener('DOMContentLoaded', function() {
-    // --- INICIALIZACIÓN DE AUTENTICACIÓN ---
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const logoutButton = document.getElementById('logout-btn');
+    // --- VERIFICACIÓN DE AUTENTICACIÓN AL CARGAR INDEX.HTML ---
+    const loggedInUser = checkLoginStatus(); // Asume que checkLoginStatus está en auth.js y ya cargado
     const bottomNav = document.querySelector('.bottom-nav');
 
-    if (loginForm && typeof handleLoginFormSubmit === 'function') {
-        loginForm.addEventListener('submit', handleLoginFormSubmit);
+    if (!loggedInUser) {
+        // Si no hay usuario, redirigir a la página de login
+        window.location.href = 'login.html';
+        return; // Detener la ejecución de más scripts en esta página
     }
-    if (registerForm && typeof handleRegisterFormSubmit === 'function') {
-        registerForm.addEventListener('submit', handleRegisterFormSubmit);
+
+    // Si el usuario está logueado, continuar con la inicialización de la app
+    if (typeof updateUIAfterLogin === 'function') {
+        updateUIAfterLogin(loggedInUser);
     }
+    if (bottomNav) bottomNav.style.display = 'flex'; // Mostrar navegación
+    
+    // Mostrar página de inicio por defecto para usuarios logueados
+    if (typeof showPage === 'function') {
+        showPage('home'); 
+    } else {
+        console.error("Función showPage no definida. Asegúrate que ui.js esté cargado antes de main.js.");
+    }
+
+    // Cargar plantas del usuario
+    if (typeof fetchAndDisplayPlants === 'function') {
+        fetchAndDisplayPlants(); 
+    } else {
+        console.error("Función fetchAndDisplayPlants no definida. Asegúrate que plants.js esté cargado.");
+    }
+    
+    // --- EVENT LISTENER BOTÓN DE CERRAR SESIÓN ---
+    const logoutButton = document.getElementById('logout-btn');
     if (logoutButton && typeof logoutUser === 'function') {
         logoutButton.addEventListener('click', logoutUser);
+    } else if(logoutButton) {
+        console.error("Función logoutUser no definida pero el botón existe.");
     }
 
-    // Verificar estado de login al cargar
-    const loggedInUser = checkLoginStatus();
-    if (loggedInUser) {
-        updateUIAfterLogin(loggedInUser);
-        if (bottomNav) bottomNav.style.display = 'flex';
-        showPage('home'); // Mostrar home si está logueado
-        if (typeof fetchAndDisplayPlants === 'function') {
-            fetchAndDisplayPlants(); // Cargar plantas del usuario
-        }
-    } else {
-        if (bottomNav) bottomNav.style.display = 'none'; // Ocultar nav si no está logueado
-        showPage('login'); // Mostrar login si no está logueado
-    }
 
     // --- INICIALIZACIÓN DEL MODO OSCURO ---
-    // (código de modo oscuro existente)
     const savedDarkMode = localStorage.getItem('darkMode');
     const darkModeToggleContainer = document.getElementById('darkModeToggleContainer');
     const darkModeCheckbox = document.getElementById('darkModeToggle'); 
@@ -46,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (darkModeCheckbox) darkModeCheckbox.checked = false;
     }
     
-    if (darkModeToggleContainer) {
+    if (darkModeToggleContainer && typeof toggleDarkMode === 'function') {
         darkModeToggleContainer.addEventListener('click', () => {
             if(darkModeCheckbox) darkModeCheckbox.click(); 
             toggleDarkMode(); 
@@ -110,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- FUNCIONALIDAD DE PLANTAS (YA INCLUIDA EN LA LÓGICA DE AUTH) ---
+    // --- FUNCIONALIDAD DE PLANTAS (FORMULARIO DE AÑADIR) ---
     const addPlantForm = document.getElementById('add-plant-form');
     if (addPlantForm && typeof handleAddPlantFormSubmit === 'function') {
         addPlantForm.addEventListener('submit', handleAddPlantFormSubmit);
