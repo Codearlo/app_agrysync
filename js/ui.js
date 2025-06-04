@@ -8,128 +8,104 @@ const pageSpecificHeaders = {
     profile: { title: "Mi Perfil", subtitle: "Agricultor Urbano Apasionado" } 
 };
 
-/**
- * Carga la estructura del header desde un archivo HTML.
- */
 async function loadAppHeaderStructure() {
     const headerContainer = document.getElementById('main-app-header');
     if (!headerContainer) {
-        console.error("UI ERROR: Contenedor principal del header (#main-app-header) no encontrado en index.html.");
+        console.error("UI ERROR: Contenedor #main-app-header no encontrado.");
         return false;
     }
-    const headerPath = 'includes/app_header.html'; 
-    console.log(`UI LOG: Intentando cargar header desde: ${headerPath}`);
+    const headerPath = 'includes/app_header.html'; // Ruta relativa desde index.html
+    console.log(`UI LOG: Intentando fetch header desde: ${headerPath}`);
     try {
         const response = await fetch(headerPath); 
         if (!response.ok) {
-            console.error(`UI ERROR: Respuesta del servidor para ${headerPath}: ${response.status} ${response.statusText}. Verifica la ruta y que el archivo exista en el servidor. Revisa la pestaña Network del navegador.`);
-            throw new Error(`No se pudo cargar ${headerPath}. Estado: ${response.status}`);
+            console.error(`UI ERROR: Fetch fallido para ${headerPath}. Estado: ${response.status} ${response.statusText}. URL completa: ${response.url}`);
+            throw new Error(`No se pudo cargar ${headerPath}.`);
         }
         const headerHtml = await response.text();
-        if (headerHtml.trim() === "") {
-            console.warn(`UI WARNING: El archivo ${headerPath} está vacío o no contiene HTML válido.`);
-            headerContainer.innerHTML = "<div class='header-content' style='padding: 1rem; text-align: center; color: white;'><p>Contenido del header no encontrado (archivo vacío).</p></div>";
+        if (!headerHtml || headerHtml.trim() === "") {
+            console.warn(`UI WARNING: ${headerPath} está vacío o no es HTML válido.`);
+            headerContainer.innerHTML = "<div class='header-content'><p style='color:white;text-align:center;'>Header vacío.</p></div>";
             return false;
         }
         headerContainer.innerHTML = headerHtml;
-        console.log("UI LOG: Estructura del header cargada en #main-app-header.");
+        console.log("UI LOG: Header cargado.");
         return true; 
     } catch (error) {
-        console.error(`UI ERROR: Excepción al cargar la estructura del header desde ${headerPath}:`, error);
-        headerContainer.innerHTML = "<div class='header-content' style='padding: 1rem; text-align: center; color: white;'><p>Error crítico al cargar el header. Revisa la consola.</p></div>";
+        console.error(`UI ERROR: Excepción cargando header desde ${headerPath}:`, error);
+        headerContainer.innerHTML = "<div class='header-content'><p style='color:white;text-align:center;'>Error crítico header.</p></div>";
         return false;
     }
 }
 
-/**
- * Carga la estructura de la barra de navegación inferior desde un archivo HTML.
- */
 async function loadBottomNavigationStructure() {
     const navContainer = document.getElementById('main-bottom-nav');
     if (!navContainer) {
-        console.error("UI ERROR: Contenedor de la barra de navegación (#main-bottom-nav) no encontrado en index.html.");
+        console.error("UI ERROR: Contenedor #main-bottom-nav no encontrado.");
         return false;
     }
-    const navPath = 'includes/bottom_navigation.html'; 
-    console.log(`UI LOG: Intentando cargar navegación desde: ${navPath}`);
+    const navPath = 'includes/bottom_navigation.html'; // Ruta relativa desde index.html
+    console.log(`UI LOG: Intentando fetch navegación desde: ${navPath}`);
     try {
         const response = await fetch(navPath);
         if (!response.ok) {
-            console.error(`UI ERROR: Respuesta del servidor para ${navPath}: ${response.status} ${response.statusText}. Verifica la ruta y que el archivo exista en el servidor. Revisa la pestaña Network del navegador.`);
-            throw new Error(`No se pudo cargar ${navPath}. Estado: ${response.status}`);
+            console.error(`UI ERROR: Fetch fallido para ${navPath}. Estado: ${response.status} ${response.statusText}. URL completa: ${response.url}`);
+            throw new Error(`No se pudo cargar ${navPath}.`);
         }
         const navHtml = await response.text();
-        if (navHtml.trim() === "") {
-            console.warn(`UI WARNING: El archivo ${navPath} está vacío o no contiene HTML válido.`);
-            navContainer.innerHTML = "<p style='text-align:center; padding:0.5rem; width:100%; color: var(--danger);'>Contenido de navegación no encontrado (archivo vacío).</p>";
+        if (!navHtml || navHtml.trim() === "") {
+            console.warn(`UI WARNING: ${navPath} está vacío o no es HTML válido.`);
+            navContainer.innerHTML = "<p style='text-align:center;color:var(--danger);'>Nav vacía.</p>";
             return false;
         }
         navContainer.innerHTML = navHtml;
-        console.log("UI LOG: Estructura de la navegación cargada en #main-bottom-nav.");
+        console.log("UI LOG: Navegación cargada.");
         return true; 
     } catch (error) {
-        console.error(`UI ERROR: Excepción al cargar la estructura de la navegación inferior desde ${navPath}:`, error);
-        navContainer.innerHTML = "<p style='text-align:center; padding:0.5rem; width:100%; color: var(--danger);'>Error crítico al cargar navegación. Revisa la consola.</p>";
+        console.error(`UI ERROR: Excepción cargando navegación desde ${navPath}:`, error);
+        navContainer.innerHTML = "<p style='text-align:center;color:var(--danger);'>Error crítico nav.</p>";
         return false;
     }
 }
 
-
-/**
- * Actualiza el contenido del header dinámico.
- * @param {string} pageId - El ID de la página actual.
- * @param {number} notificationCount - (Opcional) Número de notificaciones.
- */
 function updateAppHeader(pageId, notificationCount = null) {
     const headerTitleEl = document.getElementById('header-app-title');
     const headerSubtitleEl = document.getElementById('header-app-subtitle');
     const notificationBadgeEl = document.getElementById('header-notification-badge');
 
     if (!headerTitleEl || !headerSubtitleEl || !notificationBadgeEl) {
+        // Este console.warn es útil si la estructura del header se cargó pero faltan estos IDs internos.
         console.warn("UI WARNING: Elementos internos del header (título, subtítulo o insignia) no encontrados para actualizar. ¿El contenido de app_header.html es correcto y se cargó?");
         return;
     }
-
     const headerData = pageSpecificHeaders[pageId] || { title: "AgroSync", subtitle: "Bienvenido" };
-    
     headerTitleEl.innerHTML = headerData.title; 
     headerSubtitleEl.textContent = headerData.subtitle;
-
-    if (notificationCount !== null) {
+    if (notificationCount !== null && notificationBadgeEl) {
         notificationBadgeEl.textContent = notificationCount;
         notificationBadgeEl.style.display = notificationCount > 0 ? 'flex' : 'none';
     }
 }
 
-
-/**
- * Muestra la página especificada y actualiza la navegación y el header.
- * @param {string} pageId El ID de la página a mostrar.
- */
 function showPage(pageId) {
-    console.log(`UI LOG: Intentando mostrar página: ${pageId}`);
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => {
-        page.classList.remove('active');
-    });
-
+    console.log(`UI LOG: Mostrando página: ${pageId}`);
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const activePage = document.getElementById(pageId);
     if (activePage) {
         activePage.classList.add('active');
         const mainContent = activePage.querySelector('.main-content') || activePage;
         if (mainContent) mainContent.scrollTop = 0;
         
-        const currentNotificationBadge = document.getElementById('header-notification-badge');
-        const currentNotificationCount = currentNotificationBadge ? parseInt(currentNotificationBadge.textContent) : 0;
-        updateAppHeader(pageId, isNaN(currentNotificationCount) ? 0 : currentNotificationCount);
+        const badge = document.getElementById('header-notification-badge');
+        const count = badge ? parseInt(badge.textContent) : 0;
+        updateAppHeader(pageId, isNaN(count) ? 0 : count);
     } else {
-        console.warn(`UI WARNING: Página con ID '${pageId}' no encontrada en el DOM.`);
+        console.warn(`UI WARNING: Página con ID '${pageId}' no encontrada.`);
     }
 
     const navContainer = document.getElementById('main-bottom-nav');
     if (navContainer && navContainer.children.length > 0) { 
-        const navItems = navContainer.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
+        navContainer.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
             const onclickAttr = item.getAttribute('onclick');
             if (onclickAttr && onclickAttr.includes(`showPage('${pageId}')`)) {
@@ -139,107 +115,64 @@ function showPage(pageId) {
     }
 }
 
-/**
- * Inicializa la funcionalidad del modo oscuro.
- */
 function initializeDarkMode() {
     const savedDarkMode = localStorage.getItem('darkMode');
-    const darkModeToggleContainer = document.getElementById('darkModeToggleContainer');
-    const darkModeCheckbox = document.getElementById('darkModeToggle'); 
-
-    if (!darkModeToggleContainer || !darkModeCheckbox) {
-        console.warn("UI WARNING: Elementos para el toggle de modo oscuro no encontrados durante la inicialización.");
+    const toggleContainer = document.getElementById('darkModeToggleContainer');
+    const checkbox = document.getElementById('darkModeToggle'); 
+    if (!toggleContainer || !checkbox) {
+        console.warn("UI WARNING: Elementos del toggle de modo oscuro no encontrados.");
         return;
     }
-
     if (savedDarkMode === 'enabled') {
-        if (document.body) document.body.classList.add('dark-mode');
-        darkModeToggleContainer.classList.add('active');
-        darkModeCheckbox.checked = true;
+        if(document.body) document.body.classList.add('dark-mode');
+        toggleContainer.classList.add('active');
+        checkbox.checked = true;
     } else {
-        if (document.body) document.body.classList.remove('dark-mode');
-        darkModeToggleContainer.classList.remove('active');
-        darkModeCheckbox.checked = false;
+        if(document.body) document.body.classList.remove('dark-mode');
+        toggleContainer.classList.remove('active');
+        checkbox.checked = false;
     }
 }
 
-/**
- * Alterna el modo oscuro en la aplicación.
- */
 function toggleDarkMode() {
-    const body = document.body; // Guardar referencia
+    const body = document.body;
     if (!body || !body.classList) {
-        console.error("UI ERROR: document.body o document.body.classList no está disponible en toggleDarkMode.");
+        console.error("UI ERROR: document.body no disponible en toggleDarkMode.");
         return;
     }
-
     body.classList.toggle('dark-mode');
     const isDarkMode = body.classList.contains('dark-mode');
     localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
     
-    const darkModeToggleContainer = document.getElementById('darkModeToggleContainer');
-    const darkModeCheckbox = document.getElementById('darkModeToggle');
-
-    if (darkModeToggleContainer) {
-        if (isDarkMode) {
-            darkModeToggleContainer.classList.add('active');
-        } else {
-            darkModeToggleContainer.classList.remove('active');
-        }
-    } else {
-        console.warn("UI WARNING: Contenedor del toggle de modo oscuro (#darkModeToggleContainer) no encontrado en toggleDarkMode.");
+    const toggleContainer = document.getElementById('darkModeToggleContainer');
+    const checkbox = document.getElementById('darkModeToggle');
+    if (toggleContainer) {
+        isDarkMode ? toggleContainer.classList.add('active') : toggleContainer.classList.remove('active');
     }
-
-     if(darkModeCheckbox) {
-        darkModeCheckbox.checked = isDarkMode;
-    } else {
-        console.warn("UI WARNING: Checkbox del toggle de modo oscuro (#darkModeToggle) no encontrado en toggleDarkMode.");
-    }
+    if (checkbox) checkbox.checked = isDarkMode;
 }
 
-/**
- * Inicializa la funcionalidad del interruptor de ubicación.
- */
 function initializeLocationToggle() {
-    const locationToggleContainer = document.getElementById('locationToggleContainer');
-    const locationCheckbox = document.getElementById('locationToggle');
-
-    if (!locationToggleContainer || !locationCheckbox) {
-        console.warn("UI WARNING: Elementos para el toggle de ubicación no encontrados.");
+    const toggleContainer = document.getElementById('locationToggleContainer');
+    const checkbox = document.getElementById('locationToggle');
+    if (!toggleContainer || !checkbox) {
+        console.warn("UI WARNING: Elementos del toggle de ubicación no encontrados.");
         return;
     }
-
-    if(locationCheckbox.checked) {
-        locationToggleContainer.classList.add('active');
-    } else {
-        locationToggleContainer.classList.remove('active');
-    }
+    checkbox.checked ? toggleContainer.classList.add('active') : toggleContainer.classList.remove('active');
 }
 
-/**
- * Inicializa el feedback táctil visual para elementos interactivos.
- */
 function initializeTouchFeedback() {
     document.querySelectorAll('button, .nav-item, .action-btn, .toggle-switch').forEach(element => {
-        element.addEventListener('touchstart', function() {
-            this.style.transform = 'scale(0.97)';
-        }, { passive: true });
-        element.addEventListener('touchend', function() {
-            this.style.transform = 'scale(1)';
-        });
+        element.addEventListener('touchstart', function() { this.style.transform = 'scale(0.97)'; }, { passive: true });
+        element.addEventListener('touchend', function() { this.style.transform = 'scale(1)'; });
     });
 }
 
-/**
- * Inicializa los interruptores genéricos (que no son de modo oscuro o ubicación).
- */
 function initializeGenericToggles() {
     document.querySelectorAll('.toggle-switch').forEach(toggle => {
         if(toggle.id === 'darkModeToggleContainer' || toggle.id === 'locationToggleContainer') return;
-
         const checkbox = toggle.querySelector('input[type="checkbox"].sr-only'); 
-        if (checkbox && checkbox.checked) {
-            toggle.classList.add('active');
-        }
+        if (checkbox && checkbox.checked) toggle.classList.add('active');
     });
 }
