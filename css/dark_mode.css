@@ -1,0 +1,131 @@
+/* ============================ */
+/* === MODO OSCURO (GLOBAL) === */
+/* ============================ */
+body.dark-mode {
+    --gray-50: #111827;
+    --gray-100: #1f2937;
+    --gray-200: #374151;
+    --gray-300: #4b5563;
+    --gray-400: #6b7280;
+    --gray-500: #9ca3af;
+    --gray-600: #d1d5db;
+    --gray-700: #e5e7eb;
+    --gray-800: #f3f4f6;
+    --gray-900: #f9fafb;
+    --white: #1f2937; 
+    background-color: var(--gray-50); 
+    color: var(--gray-800); 
+}
+
+body.dark-mode .app-header {
+    background: linear-gradient(135deg, var(--secondary-green) 0%, var(--secondary-blue) 100%);
+}
+
+body.dark-mode .card {
+    border-color: var(--gray-700); 
+}
+body.dark-mode .card::before { 
+    background: linear-gradient(90deg, var(--primary-green), var(--primary-blue));
+}
+
+body.dark-mode .bottom-nav {
+    background: rgba(17, 24, 39, 0.97); 
+    border-top-color: var(--gray-700); 
+}
+body.dark-mode .bottom-nav .nav-item {
+    color: var(--gray-500);
+}
+body.dark-mode .bottom-nav .nav-item.active {
+    color: var(--primary-blue);
+    background: rgba(59, 130, 246, 0.15);
+}
+body.dark-mode .bottom-nav .nav-item:hover {
+    color: var(--primary-blue);
+    background: rgba(59, 130, 246, 0.1);
+}
+body.dark-mode .toggle-switch {
+    background: var(--gray-700); 
+}
+body.dark-mode .toggle-switch.active {
+    background: var(--success); 
+}
+body.dark-mode .toggle-circle {
+    background: var(--gray-300); 
+}
+
+body.dark-mode .page-header h2 { color: var(--gray-800); }
+body.dark-mode .page-header p { color: var(--gray-500); }
+body.dark-mode .section-header { border-bottom-color: var(--gray-700); }
+body.dark-mode .section-title { color: var(--gray-800); }
+
+/* Home Dark Mode */
+body.dark-mode .plant-item {
+    background-color: var(--gray-200); 
+    border-color: var(--gray-700);
+}
+body.dark-mode .plant-item:hover { background-color: var(--gray-100); }
+body.dark-mode .plant-info h4 { color: var(--gray-800); }
+body.dark-mode .plant-info p { color: var(--gray-500); }
+body.dark-mode .health-label { color: var(--gray-500); }
+body.dark-mode .notification-time { color: var(--gray-500); }
+
+/* Diagnosis Dark Mode */
+body.dark-mode .camera-interface {
+    background: linear-gradient(135deg, var(--gray-700) 0%, var(--gray-800) 100%);
+    color: var(--gray-50);
+}
+body.dark-mode .analysis-title { color: var(--gray-900); }
+body.dark-mode .analysis-warning, 
+body.dark-mode .analysis-success { color: var(--gray-900); }
+body.dark-mode .learning-card {
+    background: linear-gradient(135deg, var(--gray-200) 0%, var(--gray-100) 100%);
+    border-color: var(--gray-700);
+}
+body.dark-mode .learning-card h4 { color: var(--gray-800); }
+body.dark-mode .learning-card p { color: var(--gray-500); }
+
+/* Compost Dark Mode */
+body.dark-mode .compost-calculator-input label { color: var(--gray-600); }
+body.dark-mode .compost-calculator-input input[type="number"] {
+    background-color: var(--gray-200);
+    color: var(--gray-800);
+    border-color: var(--gray-600);
+}
+body.dark-mode .compost-results h4 { color: var(--gray-800); }
+body.dark-mode .compost-results p { color: var(--gray-500); }
+body.dark-mode .compost-results p strong { color: var(--gray-600); }
+body.dark-mode .compost-results ul li { color: var(--gray-500); }
+
+/* Assistant (Chat) Dark Mode */
+body.dark-mode .chat-interface { background-color: var(--gray-200); border-color: var(--gray-600); }
+body.dark-mode .chat-messages .message.bot { background-color: var(--gray-300); color: var(--gray-900); }
+body.dark-mode .chat-input-area { background-color: var(--gray-200); border-top-color: var(--gray-600); }
+body.dark-mode #userInput { background-color: var(--gray-50); color: var(--gray-800); border-color: var(--gray-600); }
+body.dark-mode #userInput::placeholder { color: var(--gray-500); }
+
+/* Profile Dark Mode */
+body.dark-mode .profile-info h3 { color: var(--gray-800); }
+body.dark-mode .profile-level { color: var(--gray-500); }
+body.dark-mode .stat-value { color: var(--primary-blue); } /* Mantener color primario si es de marca */
+body.dark-mode .stat-label { color: var(--gray-500); }
+body.dark-mode .achievement-item {
+    background: linear-gradient(135deg, var(--gray-200) 0%, var(--gray-100) 100%);
+    border-color: var(--gray-700);
+}
+body.dark-mode .achievement-name { color: var(--gray-700); }
+body.dark-mode .setting-item {
+    background-color: var(--gray-200); border-color: var(--gray-700);
+}
+body.dark-mode .setting-item:hover {
+    background-color: var(--gray-100); border-left-color: var(--primary-green);
+}
+body.dark-mode .setting-info h4 { color: var(--gray-800); }
+body.dark-mode .setting-info p { color: var(--gray-500); }
+body.dark-mode .ai-assistant { /* La tarjeta AI en perfil ya tiene su propio gradiente */ }
+body.dark-mode .assistant-btn { /* Botón dentro de la tarjeta AI */
+    background-color: var(--gray-800); 
+    color: var(--accent-purple);
+}
+body.dark-mode .assistant-btn:hover {
+    background-color: var(--gray-700); color: var(--accent-pink);
+}
