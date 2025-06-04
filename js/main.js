@@ -4,36 +4,48 @@ document.addEventListener('DOMContentLoaded', async function() { // Hacer la fun
     // --- VERIFICACIÓN DE AUTENTICACIÓN AL CARGAR INDEX.HTML ---
     const loggedInUser = checkLoginStatus(); 
     const bottomNav = document.querySelector('.bottom-nav');
-    const mainAppHeader = document.getElementById('main-app-header');
+    const mainAppHeaderContainer = document.getElementById('main-app-header'); // El contenedor <header>
 
     if (!loggedInUser) {
         window.location.href = 'login.html';
-        return; 
+        return; // Detener si no está logueado
     }
 
     // Si el usuario está logueado, cargar el header y continuar
-    let headerLoaded = false;
+    let headerContentLoaded = false;
     if (typeof loadAppHeaderStructure === 'function') {
-        headerLoaded = await loadAppHeaderStructure(); // Esperar a que el header se cargue
+        console.log("Intentando cargar estructura del header...");
+        headerContentLoaded = await loadAppHeaderStructure(); // Esperar a que el header se cargue
     } else {
-        console.error("Función loadAppHeaderStructure no definida.");
+        console.error("Función loadAppHeaderStructure no definida. Asegúrate que ui.js esté cargado y la función exportada/disponible.");
     }
 
-    if (!headerLoaded) {
-        // Si el header no se pudo cargar, podríamos mostrar un error o no continuar.
-        // Por ahora, la app podría verse extraña sin header.
-        console.error("El header principal no se pudo cargar. La aplicación podría no funcionar correctamente.");
-        // Opcionalmente, ocultar el contenedor de la app o mostrar un mensaje de error global.
+    if (!headerContentLoaded) {
+        console.error("El contenido del header principal no se pudo cargar. La aplicación podría no funcionar correctamente. Verifica la ruta a 'includes/app_header.html' y el contenido del archivo.");
+        // Opcionalmente, podrías mostrar un mensaje de error más visible en la UI aquí
+        if(mainAppHeaderContainer) mainAppHeaderContainer.innerHTML = "<p style='color:white; text-align:center; padding:1rem;'>Error al cargar el header.</p>";
+        // Decidimos si continuar o no. Si el header es crítico, podríamos retornar.
+        // return; 
     }
     
+    // Solo continuar con la inicialización completa de la UI si el header (o al menos su intento de carga) ha ocurrido.
     if (typeof updateUIAfterLogin === 'function') {
-        updateUIAfterLogin(loggedInUser); // Actualizar info de perfil
+        updateUIAfterLogin(loggedInUser); // Actualizar info de perfil que podría estar en el header o en la página de perfil
+    } else {
+        console.error("Función updateUIAfterLogin no definida.");
     }
-    if (bottomNav) bottomNav.style.display = 'flex'; 
+
+    if (bottomNav) {
+        bottomNav.style.display = 'flex'; 
+        console.log("Barra de navegación inferior debería estar visible.");
+    } else {
+        console.error("Elemento .bottom-nav no encontrado.");
+    }
     
     // Mostrar página de inicio por defecto para usuarios logueados
+    // Esto también llamará a updateAppHeader para establecer el título/subtítulo correcto
     if (typeof showPage === 'function') {
-        showPage('home'); // Esto también actualizará el contenido del header
+        showPage('home'); 
     } else {
         console.error("Función showPage no definida.");
     }
@@ -105,29 +117,34 @@ document.addEventListener('DOMContentLoaded', async function() { // Hacer la fun
     }
 
     // --- INICIALIZACIÓN DEL CHAT DEL ASISTENTE ---
-    if (typeof addMessageToChat === 'function') { 
-        chatMessagesContainerAssistant = document.querySelector('#assistant .chat-messages');
-        userInputAssistant = document.getElementById('userInput'); 
-        sendMessageBtnAssistant = document.getElementById('sendMessageBtn');  
+    // Las variables chatMessagesContainerAssistant, etc., se deben declarar globalmente en assistant.js o pasarse
+    if (typeof addMessageToChat === 'function' && typeof getGeminiResponse === 'function') { 
+        // Asegurarse que los elementos del DOM del chat existan antes de añadir listeners
+        const assistantPage = document.getElementById('assistant');
+        if (assistantPage) { // Solo configurar si la página del asistente existe en el DOM
+            chatMessagesContainerAssistant = assistantPage.querySelector('.chat-messages');
+            userInputAssistant = assistantPage.querySelector('#userInput'); // Asumir que el ID es único o está dentro de #assistant
+            sendMessageBtnAssistant = assistantPage.querySelector('#sendMessageBtn');  
 
-        if (sendMessageBtnAssistant && userInputAssistant) {
-            sendMessageBtnAssistant.addEventListener('click', () => {
-                const messageText = userInputAssistant.value.trim();
-                if (messageText) {
-                    addMessageToChat(messageText, 'user');
-                    if (typeof getGeminiResponse === 'function') {
+            if (sendMessageBtnAssistant && userInputAssistant && chatMessagesContainerAssistant) {
+                sendMessageBtnAssistant.addEventListener('click', () => {
+                    const messageText = userInputAssistant.value.trim();
+                    if (messageText) {
+                        addMessageToChat(messageText, 'user');
                         getGeminiResponse(messageText); 
+                        userInputAssistant.value = '';
+                        userInputAssistant.focus();
                     }
-                    userInputAssistant.value = '';
-                    userInputAssistant.focus();
-                }
-            });
+                });
 
-            userInputAssistant.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    if(sendMessageBtnAssistant) sendMessageBtnAssistant.click();
-                }
-            });
+                userInputAssistant.addEventListener('keypress', (event) => {
+                    if (event.key === 'Enter') {
+                        if(sendMessageBtnAssistant) sendMessageBtnAssistant.click();
+                    }
+                });
+            } else {
+                // console.warn("Elementos del chat del asistente no encontrados en la página del asistente.");
+            }
         }
     }
 
