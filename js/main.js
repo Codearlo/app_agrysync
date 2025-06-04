@@ -1,34 +1,48 @@
 // js/main.js
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() { // Hacer la función async
     // --- VERIFICACIÓN DE AUTENTICACIÓN AL CARGAR INDEX.HTML ---
-    const loggedInUser = checkLoginStatus(); // Asume que checkLoginStatus está en auth.js y ya cargado
+    const loggedInUser = checkLoginStatus(); 
     const bottomNav = document.querySelector('.bottom-nav');
+    const mainAppHeader = document.getElementById('main-app-header');
 
     if (!loggedInUser) {
-        // Si no hay usuario, redirigir a la página de login
         window.location.href = 'login.html';
-        return; // Detener la ejecución de más scripts en esta página
+        return; 
     }
 
-    // Si el usuario está logueado, continuar con la inicialización de la app
-    if (typeof updateUIAfterLogin === 'function') {
-        updateUIAfterLogin(loggedInUser);
+    // Si el usuario está logueado, cargar el header y continuar
+    let headerLoaded = false;
+    if (typeof loadAppHeaderStructure === 'function') {
+        headerLoaded = await loadAppHeaderStructure(); // Esperar a que el header se cargue
+    } else {
+        console.error("Función loadAppHeaderStructure no definida.");
     }
-    if (bottomNav) bottomNav.style.display = 'flex'; // Mostrar navegación
+
+    if (!headerLoaded) {
+        // Si el header no se pudo cargar, podríamos mostrar un error o no continuar.
+        // Por ahora, la app podría verse extraña sin header.
+        console.error("El header principal no se pudo cargar. La aplicación podría no funcionar correctamente.");
+        // Opcionalmente, ocultar el contenedor de la app o mostrar un mensaje de error global.
+    }
+    
+    if (typeof updateUIAfterLogin === 'function') {
+        updateUIAfterLogin(loggedInUser); // Actualizar info de perfil
+    }
+    if (bottomNav) bottomNav.style.display = 'flex'; 
     
     // Mostrar página de inicio por defecto para usuarios logueados
     if (typeof showPage === 'function') {
-        showPage('home'); 
+        showPage('home'); // Esto también actualizará el contenido del header
     } else {
-        console.error("Función showPage no definida. Asegúrate que ui.js esté cargado antes de main.js.");
+        console.error("Función showPage no definida.");
     }
 
     // Cargar plantas del usuario
     if (typeof fetchAndDisplayPlants === 'function') {
         fetchAndDisplayPlants(); 
     } else {
-        console.error("Función fetchAndDisplayPlants no definida. Asegúrate que plants.js esté cargado.");
+        console.error("Función fetchAndDisplayPlants no definida.");
     }
     
     // --- EVENT LISTENER BOTÓN DE CERRAR SESIÓN ---
@@ -38,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if(logoutButton) {
         console.error("Función logoutUser no definida pero el botón existe.");
     }
-
 
     // --- INICIALIZACIÓN DEL MODO OSCURO ---
     const savedDarkMode = localStorage.getItem('darkMode');
