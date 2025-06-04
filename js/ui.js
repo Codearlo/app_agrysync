@@ -14,29 +14,30 @@ const pageSpecificHeaders = {
 async function loadAppHeaderStructure() {
     const headerContainer = document.getElementById('main-app-header');
     if (!headerContainer) {
-        console.error("Contenedor principal del header (#main-app-header) no encontrado.");
+        console.error("UI ERROR: Contenedor principal del header (#main-app-header) no encontrado en index.html.");
         return false;
     }
-    const headerPath = '/includes/app_header.html'; // RUTA ABSOLUTA DESDE LA RAÍZ DEL DOMINIO
-    console.log(`Intentando cargar header desde: ${headerPath}`);
+    // Usar ruta relativa desde index.html
+    const headerPath = 'includes/app_header.html'; 
+    console.log(`UI LOG: Intentando cargar header desde: ${headerPath}`);
     try {
         const response = await fetch(headerPath); 
         if (!response.ok) {
-            console.error(`Respuesta del servidor para ${headerPath}: ${response.status} ${response.statusText}`);
+            console.error(`UI ERROR: Respuesta del servidor para ${headerPath}: ${response.status} ${response.statusText}. Verifica la ruta y que el archivo exista en el servidor. Revisa la pestaña Network del navegador.`);
             throw new Error(`No se pudo cargar ${headerPath}. Estado: ${response.status}`);
         }
         const headerHtml = await response.text();
         if (headerHtml.trim() === "") {
-            console.warn(`El archivo ${headerPath} está vacío.`);
+            console.warn(`UI WARNING: El archivo ${headerPath} está vacío o no contiene HTML válido.`);
             headerContainer.innerHTML = "<div class='header-content' style='padding: 1rem; text-align: center; color: white;'><p>Contenido del header no encontrado (archivo vacío).</p></div>";
-            return false; // Considerar como fallo si está vacío
+            return false;
         }
         headerContainer.innerHTML = headerHtml;
-        console.log("Estructura del header cargada en #main-app-header.");
+        console.log("UI LOG: Estructura del header cargada en #main-app-header.");
         return true; 
     } catch (error) {
-        console.error("Error cargando la estructura del header:", error);
-        headerContainer.innerHTML = "<div class='header-content' style='padding: 1rem; text-align: center; color: white;'><p>Error crítico al cargar el header.</p></div>";
+        console.error(`UI ERROR: Excepción al cargar la estructura del header desde ${headerPath}:`, error);
+        headerContainer.innerHTML = "<div class='header-content' style='padding: 1rem; text-align: center; color: white;'><p>Error crítico al cargar el header. Revisa la consola.</p></div>";
         return false;
     }
 }
@@ -47,29 +48,30 @@ async function loadAppHeaderStructure() {
 async function loadBottomNavigationStructure() {
     const navContainer = document.getElementById('main-bottom-nav');
     if (!navContainer) {
-        console.error("Contenedor de la barra de navegación (#main-bottom-nav) no encontrado.");
+        console.error("UI ERROR: Contenedor de la barra de navegación (#main-bottom-nav) no encontrado en index.html.");
         return false;
     }
-    const navPath = '/includes/bottom_navigation.html'; // RUTA ABSOLUTA DESDE LA RAÍZ DEL DOMINIO
-    console.log(`Intentando cargar navegación desde: ${navPath}`);
+    // Usar ruta relativa desde index.html
+    const navPath = 'includes/bottom_navigation.html'; 
+    console.log(`UI LOG: Intentando cargar navegación desde: ${navPath}`);
     try {
         const response = await fetch(navPath);
         if (!response.ok) {
-            console.error(`Respuesta del servidor para ${navPath}: ${response.status} ${response.statusText}`);
+            console.error(`UI ERROR: Respuesta del servidor para ${navPath}: ${response.status} ${response.statusText}. Verifica la ruta y que el archivo exista en el servidor. Revisa la pestaña Network del navegador.`);
             throw new Error(`No se pudo cargar ${navPath}. Estado: ${response.status}`);
         }
         const navHtml = await response.text();
         if (navHtml.trim() === "") {
-            console.warn(`El archivo ${navPath} está vacío.`);
+            console.warn(`UI WARNING: El archivo ${navPath} está vacío o no contiene HTML válido.`);
             navContainer.innerHTML = "<p style='text-align:center; padding:0.5rem; width:100%; color: var(--danger);'>Contenido de navegación no encontrado (archivo vacío).</p>";
-            return false; // Considerar como fallo si está vacío
+            return false;
         }
         navContainer.innerHTML = navHtml;
-        console.log("Estructura de la navegación cargada en #main-bottom-nav.");
+        console.log("UI LOG: Estructura de la navegación cargada en #main-bottom-nav.");
         return true; 
     } catch (error) {
-        console.error("Error cargando la estructura de la navegación inferior:", error);
-        navContainer.innerHTML = "<p style='text-align:center; padding:0.5rem; width:100%; color: var(--danger);'>Error crítico al cargar navegación.</p>";
+        console.error(`UI ERROR: Excepción al cargar la estructura de la navegación inferior desde ${navPath}:`, error);
+        navContainer.innerHTML = "<p style='text-align:center; padding:0.5rem; width:100%; color: var(--danger);'>Error crítico al cargar navegación. Revisa la consola.</p>";
         return false;
     }
 }
@@ -86,8 +88,7 @@ function updateAppHeader(pageId, notificationCount = null) {
     const notificationBadgeEl = document.getElementById('header-notification-badge');
 
     if (!headerTitleEl || !headerSubtitleEl || !notificationBadgeEl) {
-        // Este console.warn es útil si la estructura del header se cargó pero faltan estos IDs internos.
-        console.warn("Elementos internos del header (título, subtítulo o insignia) no encontrados para actualizar. ¿El contenido de app_header.html es correcto?");
+        console.warn("UI WARNING: Elementos internos del header (título, subtítulo o insignia) no encontrados para actualizar. ¿El contenido de app_header.html es correcto y se cargó?");
         return;
     }
 
@@ -108,7 +109,7 @@ function updateAppHeader(pageId, notificationCount = null) {
  * @param {string} pageId El ID de la página a mostrar.
  */
 function showPage(pageId) {
-    console.log(`Intentando mostrar página: ${pageId}`);
+    console.log(`UI LOG: Intentando mostrar página: ${pageId}`);
     const pages = document.querySelectorAll('.page');
     pages.forEach(page => {
         page.classList.remove('active');
@@ -124,7 +125,7 @@ function showPage(pageId) {
         const currentNotificationCount = currentNotificationBadge ? parseInt(currentNotificationBadge.textContent) : 0;
         updateAppHeader(pageId, isNaN(currentNotificationCount) ? 0 : currentNotificationCount);
     } else {
-        console.warn(`Página con ID '${pageId}' no encontrada en el DOM.`);
+        console.warn(`UI WARNING: Página con ID '${pageId}' no encontrada en el DOM.`);
     }
 
     const navContainer = document.getElementById('main-bottom-nav');
@@ -132,14 +133,13 @@ function showPage(pageId) {
         const navItems = navContainer.querySelectorAll('.nav-item');
         navItems.forEach(item => {
             item.classList.remove('active');
-            // Comprobar si el atributo onclick existe y si la función contiene el pageId correcto
             const onclickAttr = item.getAttribute('onclick');
             if (onclickAttr && onclickAttr.includes(`showPage('${pageId}')`)) {
                 item.classList.add('active');
             }
         });
     } else {
-        // console.warn("Contenedor de navegación o items no encontrados para actualizar estado activo.");
+        // console.warn("UI WARNING: Contenedor de navegación o items no encontrados para actualizar estado activo.");
     }
 }
 
