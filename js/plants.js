@@ -12,7 +12,7 @@ function renderPlant(plant) {
 
     const plantItem = document.createElement('div');
     plantItem.classList.add('plant-item');
-    plantItem.dataset.plantId = plant.id; // Guardar ID para futuras acciones (editar/borrar)
+    plantItem.dataset.plantId = plant.id; 
 
     let healthClass = '';
     if (plant.health_status === 'Saludable') healthClass = 'health-good';
@@ -51,22 +51,18 @@ function calculateHealthPercentage(status) {
     }
 }
 
-/**
- * Obtiene las plantas del usuario desde el backend y las muestra.
- */
 async function fetchAndDisplayPlants() {
     if (!plantsListContainer || !noPlantsMessage) return;
 
-    const user = checkLoginStatus(); // Obtener usuario logueado
+    const user = checkLoginStatus(); 
     if (!user || !user.id) {
-        plantsListContainer.innerHTML = ''; // Limpiar por si acaso
+        plantsListContainer.innerHTML = ''; 
         noPlantsMessage.textContent = 'Inicia sesión para ver tus plantas.';
         noPlantsMessage.style.display = 'block';
         return;
     }
 
     try {
-        // Pasar user_id al backend
         const response = await fetch(`backend/get_plants.php?user_id=${user.id}`); 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -89,16 +85,12 @@ async function fetchAndDisplayPlants() {
     }
 }
 
-/**
- * Maneja el envío del formulario para añadir una nueva planta.
- * @param {Event} event - El evento de envío del formulario.
- */
 async function handleAddPlantFormSubmit(event) {
     event.preventDefault(); 
 
     const user = checkLoginStatus();
     if (!user || !user.id) {
-        alert("Debes iniciar sesión para añadir plantas."); // O mostrar mensaje en UI
+        alert("Debes iniciar sesión para añadir plantas."); 
         return;
     }
 
@@ -114,7 +106,7 @@ async function handleAddPlantFormSubmit(event) {
     }
 
     const plantData = {
-        user_id: user.id, // Añadir user_id
+        user_id: user.id, 
         plant_name: plantNameInput.value.trim(),
         plant_description: plantDescriptionInput.value.trim(),
         health_status: plantHealthInput.value
@@ -145,7 +137,6 @@ async function handleAddPlantFormSubmit(event) {
             addPlantMessage.style.color = 'var(--success)';
             form.reset(); 
             
-            // Actualizar la lista de plantas inmediatamente
             if (plantsListContainer && noPlantsMessage) { 
                  if (noPlantsMessage.style.display === 'block') {
                     noPlantsMessage.style.display = 'none';
@@ -169,4 +160,48 @@ async function handleAddPlantFormSubmit(event) {
         addPlantMessage.textContent = 'Error de conexión al guardar la planta.';
         addPlantMessage.style.color = 'var(--danger)';
     }
+}
+
+/**
+ * Inicia una simulación de actualización de salud para la primera planta en la lista (ejemplo).
+ */
+function startPlantHealthSimulation() {
+    console.log("Iniciando simulación de salud de plantas (ejemplo).");
+    setInterval(() => {
+        // Este selector es muy específico, idealmente las plantas tendrían IDs únicos
+        // o una forma de identificar la planta a actualizar.
+        const firstPlantItem = document.querySelector('#plants-list-container .plant-item');
+        if (firstPlantItem) {
+            const healthValueElement = firstPlantItem.querySelector('.health-value');
+            const healthStatusText = firstPlantItem.querySelector('.plant-health .health-label'); // Para actualizar el texto del estado
+
+            if (healthValueElement && healthValueElement.textContent.includes('%')) {
+                let currentHealth = parseInt(healthValueElement.textContent);
+                // Simular un cambio pequeño
+                const change = Math.floor(Math.random() * 11) - 5; // -5 a +5
+                currentHealth = Math.max(30, Math.min(100, currentHealth + change)); // Mantener entre 30 y 100
+                
+                let newStatus = 'Saludable';
+                let newHealthClass = 'health-good';
+
+                if (currentHealth < 50) {
+                    newStatus = 'Peligro';
+                    newHealthClass = 'health-danger';
+                } else if (currentHealth < 80) {
+                    newStatus = 'Advertencia';
+                    newHealthClass = 'health-warning';
+                }
+                
+                healthValueElement.textContent = currentHealth + '%';
+                healthValueElement.className = `health-value ${newHealthClass}`; // Actualizar clase de color
+                if(healthStatusText) healthStatusText.textContent = `Salud (${newStatus})`;
+
+                // Actualizar el borde del item
+                firstPlantItem.classList.remove('health-good', 'health-warning', 'health-danger'); // Limpiar clases antiguas del item si se usan para el borde
+                // Y añadir la nueva (esto depende de cómo esté implementado el borde en CSS)
+                // Por ejemplo, si el :before del plant-item depende de la clase en health-value, ya está.
+                // Si no, se necesitaría añadir la clase al plantItem también.
+            }
+        }
+    }, 20000); // Cada 20 segundos
 }
