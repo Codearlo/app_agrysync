@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AgriSmart</title>
+    <title>AgroSync</title>
     <!-- CSS Base y Variables -->
     <link rel="stylesheet" href="css/base.css">
     <!-- CSS Componentes/Secciones -->
@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="css/responsive_utilities.css">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 <body>
     <div class="app-container">
@@ -26,8 +27,8 @@
         <div id="home" class="page active">
             <header class="app-header">
                 <div class="header-content">
-                    <div class="app-title">AgriSmart <i class="fas fa-leaf"></i></div>
-                    <div class="app-subtitle">Tu jardín inteligente</div>
+                    <div class="app-title">AgroSync <i class="fas fa-leaf"></i></div>
+                    <div class="app-subtitle">Tu jardín inteligente y sincronizado</div>
                     <div class="notification-badge">3</div>
                 </div>
             </header>
@@ -71,43 +72,15 @@
                     </button>
                 </section>
 
-                <!-- Plants Section -->
+                <!-- Plants Section - Modificado para carga dinámica -->
                 <section class="card">
                     <div class="section-header">
                         <span class="section-emoji"><i class="fas fa-seedling"></i></span>
                         <h3 class="section-title">Mis Plantas</h3>
                     </div>
-                    <div class="plants-list">
-                        <div class="plant-item">
-                            <div class="plant-info">
-                                <h4>Tomates Cherry</h4>
-                                <p>Pulgón detectado</p>
-                            </div>
-                            <div class="plant-health">
-                                <div class="health-value health-warning">85%</div>
-                                <div class="health-label">Salud</div>
-                            </div>
-                        </div>
-                        <div class="plant-item">
-                            <div class="plant-info">
-                                <h4>Lechugas</h4>
-                                <p>Saludable</p>
-                            </div>
-                            <div class="plant-health">
-                                <div class="health-value health-good">95%</div>
-                                <div class="health-label">Salud</div>
-                            </div>
-                        </div>
-                        <div class="plant-item">
-                            <div class="plant-info">
-                                <h4>Albahaca</h4>
-                                <p>Hongo detectado</p>
-                            </div>
-                            <div class="plant-health">
-                                <div class="health-value health-danger">70%</div>
-                                <div class="health-label">Salud</div>
-                            </div>
-                        </div>
+                    <div id="plants-list-container" class="plants-list">
+                        <!-- Las plantas se cargarán aquí dinámicamente -->
+                        <p id="no-plants-message" style="display: none; text-align: center; color: var(--gray-500);">Aún no has añadido ninguna planta. ¡Ve a tu perfil para empezar!</p>
                     </div>
                 </section>
 
@@ -160,7 +133,7 @@
                             <span class="camera-emoji"><i class="fas fa-camera-retro"></i></span>
                             <p>Apunta a la hoja afectada y toma una foto clara.</p>
                         </div>
-                        <button class="camera-btn" onclick="simulateCamera()"><i class="fas fa-camera"></i> Tomar Foto</button>
+                        <button class="camera-btn" onclick="simulateCamera(event)"><i class="fas fa-camera"></i> Tomar Foto</button>
                     </div>
                 </section>
                 <section class="card">
@@ -284,7 +257,7 @@
                     <h2><i class="fas fa-comments"></i> Chatea con AgriBot</h2>
                     <p>Resuelve tus dudas sobre jardinería y agricultura.</p>
                 </div>
-                <section class="card" style="padding: 0; overflow:visible;">
+                <section class="card" style="padding: 0; overflow:visible;"> <!-- Ajuste para que el chat use todo el espacio de la card -->
                     <div class="chat-interface"> 
                         <div class="chat-messages">
                             <div class="message bot">¡Hola! Soy AgriBot. ¿Cómo puedo ayudarte con tu jardín hoy?</div>
@@ -312,6 +285,38 @@
                     <h3>Tu Nombre de Usuario</h3>
                     <p class="profile-level">Nivel 5 • 1,250 XP <i class="fas fa-star" style="color: var(--warning);"></i></p>
                 </section>
+
+                <!-- Add New Plant Section -->
+                <section class="card">
+                    <div class="section-header">
+                        <span class="section-emoji"><i class="fas fa-plus-circle"></i></span>
+                        <h3 class="section-title">Añadir Nueva Planta</h3>
+                    </div>
+                    <form id="add-plant-form" class="add-plant-form">
+                        <div class="form-group">
+                            <label for="plant-name">Nombre de la Planta:</label>
+                            <input type="text" id="plant-name" name="plant_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="plant-description">Descripción (opcional):</label>
+                            <textarea id="plant-description" name="plant_description" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="plant-health">Estado de Salud Inicial:</label>
+                            <select id="plant-health" name="plant_health" required>
+                                <option value="Saludable" selected>Saludable</option>
+                                <option value="Advertencia">Advertencia</option>
+                                <option value="Peligro">Peligro</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="action-btn" style="width: 100%; margin-top: 1rem;">
+                            <i class="fas fa-save"></i> Guardar Planta
+                        </button>
+                    </form>
+                    <div id="add-plant-message" class="form-message" style="margin-top: 1rem;"></div>
+                </section>
+
+
                 <section class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-value">15</div>
@@ -395,7 +400,7 @@
                 <section class="ai-assistant">
                     <div class="assistant-header">
                         <span class="section-emoji"><i class="fas fa-robot"></i></span>
-                        <h3 class="section-title">Asistente IA AgriSmart</h3>
+                        <h3 class="section-title">Asistente IA AgroSync</h3>
                     </div>
                     <div class="assistant-content">
                         <p>¡Hola! Soy tu asistente agrícola personal. ¿Tienes alguna pregunta sobre tus cultivos o necesitas algún consejo?</p>
@@ -435,6 +440,7 @@
     <script src="js/camera.js"></script>
     <script src="js/compost.js"></script>
     <script src="js/assistant.js"></script>
+    <script src="js/plants.js"></script> <!-- Nuevo script para plantas -->
     <script src="js/main.js"></script> 
 </body>
 </html>
