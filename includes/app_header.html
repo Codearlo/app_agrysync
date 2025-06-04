@@ -1,6 +1,88 @@
 <!-- includes/app_header.html -->
-<div class="header-content">
-    <div class="app-title" id="header-app-title">AgroSync <i class="fas fa-leaf"></i></div>
-    <div class="app-subtitle" id="header-app-subtitle">Tu jardín inteligente</div>
-    <div class="notification-badge" id="header-notification-badge">0</div>
-</div>
+<style>
+    /* Estilos específicos para el Header, extraídos y adaptados de base.css y dark_mode.css */
+    /* Las variables CSS (--primary-green, etc.) se asumen definidas en un base.css global enlazado en index.html */
+    
+    .app-header { /* Estilo base del contenedor del header */
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-blue) 100%);
+        color: var(--white);
+        padding: 1.25rem 1rem; 
+        min-height: 70px; 
+        display: flex; 
+        align-items: center; 
+        position: sticky; 
+        top: 0;
+        z-index: 100; 
+        box-shadow: var(--shadow-lg);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .header-content { /* Contenido dentro del header */
+        max-width: 1200px; 
+        margin: 0 auto; 
+        position: relative; 
+        width: 100%; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: center; 
+    }
+    
+    .app-title { /* Título de la aplicación */
+        font-size: 1.75rem; 
+        font-weight: 800;
+        margin-bottom: 0.15rem; 
+        letter-spacing: -0.025em;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .app-title i { margin-left: 0.5rem; }
+    
+    .app-subtitle { /* Subtítulo de la aplicación */
+        font-size: 0.9rem; 
+        opacity: 0.9;
+        font-weight: 500;
+    }
+    
+    .notification-badge { /* Insignia de notificación */
+        position: absolute;
+        top: 50%; 
+        transform: translateY(-50%);
+        right: 1rem; 
+        background: var(--danger);
+        color: var(--white);
+        border-radius: 50%;
+        width: 26px; 
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        animation: pulseHeaderBadge 2s infinite; /* Renombrar animación para evitar conflictos */
+        border: 2px solid var(--white); 
+    }
+    
+    @keyframes pulseHeaderBadge { /* Animación renombrada */
+        0%, 100% { 
+            transform: scale(1) translateY(-50%); 
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        }
+        50% { 
+            transform: scale(1.15) translateY(-50%); 
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.6);
+        }
+    }
+    
+    /* Estilos de Modo Oscuro para el Header */
+    body.dark-mode .app-header {
+        background: linear-gradient(135deg, var(--secondary-green) 0%, var(--secondary-blue) 100%);
+    }
+    /* El color del texto y la insignia ya deberían funcionar bien con las variables CSS globales de dark-mode */
+    
+    </style>
+    <div class="header-content">
+        <div class="app-title" id="header-app-title">AgroSync <i class="fas fa-leaf"></i></div>
+        <div class="app-subtitle" id="header-app-subtitle">Tu jardín inteligente</div>
+        <div class="notification-badge" id="header-notification-badge">0</div>
+    </div>
+    

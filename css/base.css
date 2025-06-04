@@ -65,76 +65,24 @@ body {
     position: relative; 
 }
 
-/* Header General */
+/* El .app-header (contenedor vacío en index.html) aún necesita algunos estilos base 
+   para posicionamiento y fondo, pero el contenido interno (.header-content, etc.)
+   tendrá sus estilos en includes/app_header.html */
 .app-header {
-    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-blue) 100%);
-    color: var(--white);
-    padding: 1.25rem 1rem; /* Ajustar padding si es necesario */
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-blue) 100%); /* Fondo por defecto */
+    color: var(--white); /* Color de texto por defecto para el header */
     min-height: 70px; /* Altura mínima para asegurar visibilidad */
-    display: flex; /* Para centrar contenido si es necesario */
-    align-items: center; /* Centrar verticalmente el .header-content */
+    display: flex; 
+    align-items: center; 
     position: sticky; 
     top: 0;
     z-index: 100; 
     box-shadow: var(--shadow-lg);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* padding y border-bottom se pueden manejar aquí o en el include si se prefiere */
+    padding: 0; /* El padding ahora lo manejará el .header-content dentro del include */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Mantener un borde sutil */
 }
 
-.header-content {
-    max-width: 1200px; 
-    margin: 0 auto; 
-    position: relative; 
-    width: 100%; /* Para que ocupe el ancho disponible dentro del header */
-    display: flex; /* Para alinear título, subtítulo y notificación */
-    flex-direction: column; /* Apilar título y subtítulo */
-    justify-content: center; /* Centrar verticalmente si el header tiene altura fija */
-}
-
-.app-title {
-    font-size: 1.75rem; /* Ligeramente más pequeño para caber mejor */
-    font-weight: 800;
-    margin-bottom: 0.15rem; /* Menos espacio */
-    letter-spacing: -0.025em;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-.app-title i { margin-left: 0.5rem; }
-
-.app-subtitle {
-    font-size: 0.9rem; /* Ligeramente más pequeño */
-    opacity: 0.9;
-    font-weight: 500;
-}
-
-.notification-badge { 
-    position: absolute;
-    top: 50%; /* Centrar verticalmente respecto al .header-content */
-    transform: translateY(-50%);
-    right: 1rem; /* Espacio desde el borde */
-    background: var(--danger);
-    color: var(--white);
-    border-radius: 50%;
-    width: 26px; /* Ligeramente más pequeño */
-    height: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 700;
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
-    animation: pulse 2s infinite;
-    border: 2px solid var(--white); 
-}
-
-@keyframes pulse {
-    0%, 100% { 
-        transform: scale(1) translateY(-50%); /* Mantener translateY para centrado vertical */
-        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
-    }
-    50% { 
-        transform: scale(1.15) translateY(-50%); 
-        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.6);
-    }
-}
 
 /* Contenido Principal y Gestión de Páginas */
 .main-content { 
@@ -255,7 +203,7 @@ body {
     color: var(--white);
     border: none;
     border-radius: var(--border-radius-lg);
-    padding: 1.25rem 1rem; /* Ajustado de home.css */
+    padding: 1.25rem 1rem; 
     text-align: center;
     cursor: pointer;
     transition: var(--transition);
@@ -264,7 +212,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center; 
-    gap: 0.5rem; /* Ajustado de home.css */
+    gap: 0.5rem; 
     position: relative;
     overflow: hidden;
 }
@@ -291,13 +239,13 @@ body {
 }
 .action-btn.secondary:hover { box-shadow: 0 12px 35px rgba(59, 130, 246, 0.35); }
 .action-emoji { 
-    font-size: 2rem; /* Ajustado de home.css */
+    font-size: 2rem; 
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     transition: transform 0.3s ease;
 }
 .action-btn:hover .action-emoji { transform: scale(1.1) rotate(-5deg); }
 .action-text {
-    font-size: 0.9rem; /* Ajustado de home.css */
+    font-size: 0.9rem; 
     font-weight: 600;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }

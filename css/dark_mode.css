@@ -17,9 +17,7 @@ body.dark-mode {
     color: var(--gray-800); 
 }
 
-body.dark-mode .app-header {
-    background: linear-gradient(135deg, var(--secondary-green) 0%, var(--secondary-blue) 100%);
-}
+/* Los estilos de .app-header y .bottom-nav en modo oscuro ahora están en sus respectivos archivos HTML de inclusión */
 
 body.dark-mode .card {
     border-color: var(--gray-700); 
@@ -28,21 +26,6 @@ body.dark-mode .card::before {
     background: linear-gradient(90deg, var(--primary-green), var(--primary-blue));
 }
 
-body.dark-mode .bottom-nav {
-    background: rgba(17, 24, 39, 0.97); 
-    border-top-color: var(--gray-700); 
-}
-body.dark-mode .bottom-nav .nav-item {
-    color: var(--gray-500);
-}
-body.dark-mode .bottom-nav .nav-item.active {
-    color: var(--primary-blue);
-    background: rgba(59, 130, 246, 0.15);
-}
-body.dark-mode .bottom-nav .nav-item:hover {
-    color: var(--primary-blue);
-    background: rgba(59, 130, 246, 0.1);
-}
 body.dark-mode .toggle-switch {
     background: var(--gray-700); 
 }
@@ -52,7 +35,6 @@ body.dark-mode .toggle-switch.active {
 body.dark-mode .toggle-circle {
     background: var(--gray-300); 
 }
-
 body.dark-mode .page-header h2 { color: var(--gray-800); }
 body.dark-mode .page-header p { color: var(--gray-500); }
 body.dark-mode .section-header { border-bottom-color: var(--gray-700); }
@@ -71,10 +53,10 @@ body.dark-mode .notification-time { color: var(--gray-500); }
 
 /* Diagnosis Dark Mode */
 body.dark-mode .camera-interface {
-    background: linear-gradient(135deg, var(--gray-700) 0%, var(--gray-800) 100%);
-    color: var(--gray-50);
+    /* El color de texto ya es var(--white) que se convierte a oscuro */
+    /* El fondo ya está definido en el include */
 }
-body.dark-mode .analysis-title { color: var(--gray-900); }
+body.dark-mode .analysis-title { color: var(--gray-900); } 
 body.dark-mode .analysis-warning, 
 body.dark-mode .analysis-success { color: var(--gray-900); }
 body.dark-mode .learning-card {
@@ -97,7 +79,7 @@ body.dark-mode .compost-results p strong { color: var(--gray-600); }
 body.dark-mode .compost-results ul li { color: var(--gray-500); }
 
 /* Assistant (Chat) Dark Mode */
-body.dark-mode .chat-interface { background-color: var(--gray-200); border-color: var(--gray-600); }
+body.dark-mode .chat-interface { background-color: var(--gray-200); border-color: var(--gray-600); } 
 body.dark-mode .chat-messages .message.bot { background-color: var(--gray-300); color: var(--gray-900); }
 body.dark-mode .chat-input-area { background-color: var(--gray-200); border-top-color: var(--gray-600); }
 body.dark-mode #userInput { background-color: var(--gray-50); color: var(--gray-800); border-color: var(--gray-600); }
@@ -106,7 +88,7 @@ body.dark-mode #userInput::placeholder { color: var(--gray-500); }
 /* Profile Dark Mode */
 body.dark-mode .profile-info h3 { color: var(--gray-800); }
 body.dark-mode .profile-level { color: var(--gray-500); }
-body.dark-mode .stat-value { color: var(--primary-blue); } /* Mantener color primario si es de marca */
+body.dark-mode .stat-value { color: var(--primary-blue); } 
 body.dark-mode .stat-label { color: var(--gray-500); }
 body.dark-mode .achievement-item {
     background: linear-gradient(135deg, var(--gray-200) 0%, var(--gray-100) 100%);
@@ -121,8 +103,8 @@ body.dark-mode .setting-item:hover {
 }
 body.dark-mode .setting-info h4 { color: var(--gray-800); }
 body.dark-mode .setting-info p { color: var(--gray-500); }
-body.dark-mode .ai-assistant { /* La tarjeta AI en perfil ya tiene su propio gradiente */ }
-body.dark-mode .assistant-btn { /* Botón dentro de la tarjeta AI */
+body.dark-mode .ai-assistant { /* Estilos de fondo ya definidos en el include */ }
+body.dark-mode .assistant-btn { 
     background-color: var(--gray-800); 
     color: var(--accent-purple);
 }

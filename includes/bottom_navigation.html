@@ -1,21 +1,147 @@
 <!-- includes/bottom_navigation.html -->
-<button class="nav-item active" onclick="showPage('home')">
-    <span class="nav-emoji"><i class="fas fa-home"></i></span>
-    <span class="nav-label">Inicio</span>
-</button>
-<button class="nav-item" onclick="showPage('diagnosis')">
-    <span class="nav-emoji"><i class="fas fa-stethoscope"></i></span>
-    <span class="nav-label">Diagnóstico</span>
-</button>
-<button class="nav-item" onclick="showPage('compost')"> 
-    <span class="nav-emoji"><i class="fas fa-recycle"></i></span>
-    <span class="nav-label">Compost</span>
-</button>
- <button class="nav-item" onclick="showPage('assistant')">
-    <span class="nav-emoji"><i class="fas fa-comments"></i></span>
-    <span class="nav-label">Asistente</span>
-</button>
-<button class="nav-item" onclick="showPage('profile')">
-    <span class="nav-emoji"><i class="fas fa-user-circle"></i></span>
-    <span class="nav-label">Perfil</span>
-</button>
+<style>
+    /* Estilos específicos para la Barra de Navegación Inferior, extraídos y adaptados de navigation.css y dark_mode.css */
+    /* Las variables CSS (--primary-blue, etc.) se asumen definidas en un base.css global enlazado en index.html */
+    
+    .bottom-nav { /* Estilo base del contenedor de navegación */
+        position: fixed;
+        bottom: 0;
+        width: 100%; 
+        max-width: 1200px; 
+        margin-left: auto;
+        margin-right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        
+        background: rgba(255, 255, 255, 0.97); 
+        backdrop-filter: blur(25px); 
+        -webkit-backdrop-filter: blur(25px);
+        border-top: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-around; 
+        padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom)); 
+        z-index: 1000;
+        box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.08); 
+        
+        border-top-left-radius: var(--border-radius-lg); 
+        border-top-right-radius: var(--border-radius-lg); 
+        min-height: 60px; 
+    }
+    
+    .bottom-nav .nav-item { /* Estilo de cada ítem de navegación */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center; 
+        padding: 0.25rem 0.5rem; 
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--gray-500);
+        text-decoration: none;
+        min-width: 60px; 
+        min-height: 50px; 
+        border-radius: var(--border-radius);
+        position: relative; 
+        flex-grow: 1; 
+    }
+    
+    .bottom-nav .nav-item::before { /* Indicador superior para ítem activo */
+        content: '';
+        position: absolute;
+        top: -1px; 
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0; 
+        height: 3px; 
+        background: var(--primary-blue);
+        border-radius: 0 0 3px 3px; 
+        opacity: 0;
+        transition: width 0.3s ease, opacity 0.3s ease;
+    }
+    
+    .bottom-nav .nav-item.active {
+        color: var(--primary-blue);
+    }
+    
+    .bottom-nav .nav-item.active::before {
+        opacity: 1;
+        width: 60%; 
+    }
+    
+    .bottom-nav .nav-item:hover {
+        color: var(--primary-blue);
+        background: rgba(59, 130, 246, 0.05); 
+    }
+    .bottom-nav .nav-item:hover::before {
+        opacity: 0.7;
+        width: 40%;
+    }
+    .bottom-nav .nav-item.active:hover::before {
+        width: 70%; 
+    }
+    
+    .nav-emoji { /* Contenedor del emoji/icono */
+        font-size: 1.5rem; 
+        margin-bottom: 0.25rem; 
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
+        transition: var(--transition);
+        line-height: 1; 
+    }
+    .nav-emoji i { transition: transform 0.3s ease; }
+    
+    .bottom-nav .nav-item:hover .nav-emoji i {
+        transform: scale(1.15) translateY(-2px); 
+    }
+    .bottom-nav .nav-item.active .nav-emoji i {
+        transform: scale(1.1) translateY(-1px);
+    }
+    
+    .nav-label { /* Etiqueta de texto del ítem */
+        font-size: 0.6875rem; 
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        line-height: 1.2; 
+    }
+    
+    /* Estilos de Modo Oscuro para la Navegación */
+    body.dark-mode .bottom-nav {
+        background: rgba(17, 24, 39, 0.97); 
+        border-top-color: var(--gray-700); 
+    }
+    body.dark-mode .bottom-nav .nav-item {
+        color: var(--gray-500);
+    }
+    body.dark-mode .bottom-nav .nav-item.active {
+        color: var(--primary-blue);
+        background: rgba(59, 130, 246, 0.15);
+    }
+    body.dark-mode .bottom-nav .nav-item:hover {
+        color: var(--primary-blue);
+        background: rgba(59, 130, 246, 0.1);
+    }
+    
+    </style>
+    <button class="nav-item active" onclick="showPage('home')">
+        <span class="nav-emoji"><i class="fas fa-home"></i></span>
+        <span class="nav-label">Inicio</span>
+    </button>
+    <button class="nav-item" onclick="showPage('diagnosis')">
+        <span class="nav-emoji"><i class="fas fa-stethoscope"></i></span>
+        <span class="nav-label">Diagnóstico</span>
+    </button>
+    <button class="nav-item" onclick="showPage('compost')"> 
+        <span class="nav-emoji"><i class="fas fa-recycle"></i></span>
+        <span class="nav-label">Compost</span>
+    </button>
+     <button class="nav-item" onclick="showPage('assistant')">
+        <span class="nav-emoji"><i class="fas fa-comments"></i></span>
+        <span class="nav-label">Asistente</span>
+    </button>
+    <button class="nav-item" onclick="showPage('profile')">
+        <span class="nav-emoji"><i class="fas fa-user-circle"></i></span>
+        <span class="nav-label">Perfil</span>
+    </button>
+    
