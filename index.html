@@ -176,10 +176,17 @@
                 <section class="camera-section card">
                     <div class="camera-interface">
                         <div class="camera-preview">
+                            <video id="camera-preview" autoplay playsinline></video>
+                            <canvas id="camera-canvas" style="display:none;"></canvas>
                             <span class="camera-emoji"><i class="fas fa-camera-retro"></i></span>
                             <p>Apunta a la hoja afectada y toma una foto clara.</p>
                         </div>
-                        <button class="camera-btn" onclick="alert('Función de cámara en desarrollo')"><i class="fas fa-camera"></i> Tomar Foto</button>
+                        <button class="camera-btn" id="take-photo-btn"><i class="fas fa-camera"></i> Tomar Foto</button>
+                    </div>
+                    <div id="plant-analysis-results" style="display: none;">
+                        <h3>Análisis de la Planta</h3>
+                        <p id="plant-health-percentage"></p>
+                        <p id="possible-diseases"></p>
                     </div>
                 </section>
             </main>
@@ -325,6 +332,7 @@
     </nav>
 
     <!-- JavaScript simple y funcional -->
+    <script src="js/camera.js"></script>
     <script>
         // Función básica para cambiar páginas
         function showPage(pageId) {

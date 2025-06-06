@@ -3,7 +3,61 @@
 let chatMessagesContainerAssistant; 
 let userInputAssistant;
 let sendMessageBtnAssistant;
-let chatHistory = []; 
+let chatHistory = [];
+
+async function analyzePlantHealth(image) {
+    const apiKey = "AIzaSyCObTKToTanRgfD4TaQLLRWKMRmPjH7ubM";
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const systemPromptText = `Eres un experto en el diagnóstico de enfermedades de plantas. Analiza la imagen proporcionada y determina las posibles enfermedades que pueda tener la planta, así como un porcentaje estimado de salud.`;
+
+    const base64Image = image.split(',')[1];
+    const imagePart = {
+        inlineData: {
+            data: base64Image,
+            mimeType: "image/jpeg"
+        }
+    };
+
+    const prompt = "Analiza esta imagen para detectar posibles enfermedades de la planta y su porcentaje de salud.";
+
+    const payload = {
+        contents: [{
+            role: "user",
+            parts: [
+                { text: prompt },
+                imagePart
+            ]
+        }],
+        systemInstruction: { parts: [{ text: systemPromptText }] },
+    };
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: { message: "No se pudo obtener detalle del error." } }));
+            console.error("Error de API Gemini:", response.status, errorData);
+            let errorMessage = `Lo siento, no pude procesar tu solicitud en este momento (Error: ${response.status}) 😔.`;
+            addMessageToChat(errorMessage, 'bot-error');
+            return;
+        }
+
+        const result = await response.json();
+        if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+            addMessageToChat(result.candidates[0].content.parts[0].text, 'bot');
+        } else {
+            console.error("Respuesta inesperada de la API de Gemini:", result);
+            addMessageToChat("Recibí una respuesta inesperada 😕. Por favor, intenta reformular tu pregunta o inténtalo más tarde.", 'bot-error');
+        }
+    } catch (error) {
+        console.error("Error al llamar a la API de Gemini:", error);
+        addMessageToChat("Hubo un problema de conexión al intentar obtener una respuesta 🌐🔌. Verifica tu conexión a internet e inténtalo de nuevo.", 'bot-error');
+    }
+}
 
 function addMessageToChat(text, sender) {
     if (!chatMessagesContainerAssistant) {
@@ -15,7 +69,7 @@ function addMessageToChat(text, sender) {
     }
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', sender);
-    messageDiv.textContent = text; 
+    messageDiv.textContent = text;
     chatMessagesContainerAssistant.appendChild(messageDiv);
     chatMessagesContainerAssistant.scrollTop = chatMessagesContainerAssistant.scrollHeight;
 }

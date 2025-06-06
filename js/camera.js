@@ -1,28 +1,49 @@
 // js/camera.js
 
-/**
- * Simula el proceso de tomar una foto y analizarla.
- * Actualiza el texto y estilo del botón de la cámara.
- * @param {Event} event - El evento click del botón.
- */
-function simulateCamera(event) { // Pasamos el evento para acceder a event.target
-    const btn = event.target.closest('.camera-btn'); 
-    if (!btn) return;
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('camera-preview');
+    const canvas = document.getElementById('camera-canvas');
+    const takePhotoBtn = document.getElementById('take-photo-btn');
+    const plantAnalysisResults = document.getElementById('plant-analysis-results');
+    const plantHealthPercentage = document.getElementById('plant-health-percentage');
+    const possibleDiseases = document.getElementById('possible-diseases');
 
-    const originalText = btn.innerHTML; 
-    const originalGradient = btn.style.background;
+    // Verificar si los elementos existen
+    if (!video || !canvas || !takePhotoBtn || !plantAnalysisResults || !plantHealthPercentage || !possibleDiseases) {
+        console.error("No se encontraron todos los elementos necesarios para la cámara.");
+        return;
+    }
 
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Escaneando...';
-    btn.style.background = 'var(--warning)';
-    btn.disabled = true;
+    // Acceder a la cámara
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            video.srcObject = stream;
+        } catch (error) {
+            console.error("Error al acceder a la cámara:", error);
+            alert("No se pudo acceder a la cámara. Verifica los permisos.");
+        }
+    }
 
-    setTimeout(() => {
-        btn.innerHTML = '<i class="fas fa-check-circle"></i> Análisis Completo';
-        btn.style.background = 'var(--success)';
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.style.background = originalGradient; // Restaurar el gradiente original si es necesario
-            btn.disabled = false;
-        }, 2000);
-    }, 2500);
-}
+    // Tomar la foto
+    takePhotoBtn.addEventListener('click', function() {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        const imageDataURL = canvas.toDataURL('image/jpeg');
+
+        // Detener la cámara
+        video.srcObject.getVideoTracks().forEach(track => track.stop());
+
+        // Mostrar los resultados del análisis (temporalmente ocultos)
+        plantAnalysisResults.style.display = 'block';
+        plantHealthPercentage.textContent = 'Analizando...';
+        possibleDiseases.textContent = '';
+
+        // Llamar a la función de análisis de la planta
+        analyzePlantHealth(imageDataURL);
+    });
+
+    // Iniciar la cámara al cargar la página
+    startCamera();
+});
