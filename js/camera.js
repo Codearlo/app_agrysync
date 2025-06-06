@@ -17,8 +17,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Acceder a la cámara
     async function startCamera() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            video.srcObject = stream;
+            console.log("Starting camera...");
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+            console.log("Got stream:", stream);
+            try {
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    console.log("Metadata loaded");
+                    video.play();
+                };
+            } catch (error) {
+                console.error("Error setting srcObject:", error);
+                alert("No se pudo acceder a la cámara. Verifica los permisos.");
+            }
         } catch (error) {
             console.error("Error al acceder a la cámara:", error);
             alert("No se pudo acceder a la cámara. Verifica los permisos.");
@@ -29,11 +40,15 @@ document.addEventListener('DOMContentLoaded', function() {
     takePhotoBtn.addEventListener('click', function() {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        try {
+            canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        } catch (error) {
+            console.error("Error drawing image to canvas:", error);
+            alert("Error al tomar la foto. Intenta de nuevo.");
+            return;
+        }
+        console.log("Image drawn to canvas");
         const imageDataURL = canvas.toDataURL('image/jpeg');
-
-        // Detener la cámara
-        video.srcObject.getVideoTracks().forEach(track => track.stop());
 
         // Mostrar los resultados del análisis (temporalmente ocultos)
         plantAnalysisResults.style.display = 'block';
