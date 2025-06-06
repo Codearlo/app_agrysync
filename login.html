@@ -6,35 +6,74 @@
     <title>Iniciar Sesión - AgroSync</title>
     <!-- CSS -->
     <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/auth.css"> <!-- Estilos específicos para autenticación -->
+    <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/dark_mode.css">
     <link rel="stylesheet" href="css/responsive_utilities.css">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body>
+<body class="auth-page">
     <div class="app-container">
-        <main class="main-content auth-content">
-            <div class="auth-card card">
+        <main class="main-content">
+            <div class="auth-card">
                 <div class="page-header">
-                    <h2><i class="fas fa-sign-in-alt"></i> Iniciar Sesión en AgroSync</h2>
-                    <p>Accede a tu jardín inteligente.</p>
+                    <h2>
+                        <i class="fas fa-sign-in-alt"></i>
+                        Iniciar Sesión
+                    </h2>
+                    <p>Accede a tu jardín inteligente</p>
                 </div>
+                
                 <form id="login-form" class="auth-form">
                     <div class="form-group">
-                        <label for="login-identifier">Usuario o Correo Electrónico:</label>
-                        <input type="text" id="login-identifier" name="login_identifier" required>
+                        <label for="login-identifier">
+                            <i class="fas fa-user" style="margin-right: 0.5rem; color: var(--primary-blue);"></i>
+                            Usuario o Correo Electrónico
+                        </label>
+                        <input 
+                            type="text" 
+                            id="login-identifier" 
+                            name="login_identifier" 
+                            placeholder="Ingresa tu usuario o email"
+                            required
+                            autocomplete="username"
+                        >
                     </div>
+                    
                     <div class="form-group">
-                        <label for="login-password">Contraseña:</label>
-                        <input type="password" id="login-password" name="login_password" required>
+                        <label for="login-password">
+                            <i class="fas fa-lock" style="margin-right: 0.5rem; color: var(--primary-blue);"></i>
+                            Contraseña
+                        </label>
+                        <input 
+                            type="password" 
+                            id="login-password" 
+                            name="login_password" 
+                            placeholder="Ingresa tu contraseña"
+                            required
+                            autocomplete="current-password"
+                        >
                     </div>
-                    <button type="submit" class="action-btn primary" style="width: 100%; margin-top: 1.5rem;">
-                        <i class="fas fa-paper-plane"></i> Ingresar
+                    
+                    <button type="submit" class="action-btn primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Ingresar
                     </button>
                 </form>
-                <div id="login-message" class="form-message" style="margin-top: 1rem;"></div>
-                <p class="auth-switch">¿No tienes cuenta? <a href="register.html">Regístrate aquí</a></p>
+                
+                <div id="login-message" class="form-message"></div>
+                
+                <div class="auth-switch">
+                    ¿No tienes cuenta? 
+                    <a href="register.html">Regístrate aquí</a>
+                </div>
+                
+                <div class="auth-switch" style="margin-top: 1rem; border-top: none;">
+                    <a href="index.html" style="color: var(--gray-500); font-weight: 500;">
+                        <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+                        Volver al inicio
+                    </a>
+                </div>
             </div>
         </main>
     </div>
@@ -50,9 +89,28 @@
             }
 
             // Verificar si el usuario ya está logueado y redirigir a index.html si es así
-            const loggedInUser = checkLoginStatus(); // Asume que checkLoginStatus está en auth.js
+            const loggedInUser = checkLoginStatus();
             if (loggedInUser) {
                 window.location.href = 'index.html';
+            }
+            
+            // Agregar efectos de enfoque automático
+            const firstInput = document.getElementById('login-identifier');
+            if (firstInput) {
+                firstInput.focus();
+            }
+            
+            // Efecto de tecla Enter para cambiar al siguiente campo
+            const identifierInput = document.getElementById('login-identifier');
+            const passwordInput = document.getElementById('login-password');
+            
+            if (identifierInput && passwordInput) {
+                identifierInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        passwordInput.focus();
+                    }
+                });
             }
         });
     </script>
