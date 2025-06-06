@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>AgroSync</title>
     
-    <!-- Favicon para evitar error 404 -->
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
     
     <!-- CSS -->
@@ -24,38 +24,40 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Contenedor para el Header Dinámico -->
+        <!-- Header dinámico -->
         <header class="app-header" id="main-app-header">
-            <!-- El contenido del header se cargará aquí por JavaScript -->
+            <div class="header-content">
+                <div class="app-title">AgroSync <i class="fas fa-leaf"></i></div>
+                <div class="app-subtitle">Tu jardín inteligente</div>
+            </div>
         </header>
 
         <!-- Page: Home -->
-        <div id="home" class="page"> 
+        <div id="home" class="page active"> 
             <main class="main-content">
-                <!-- Contenido de Home -->
                 <section class="weather-card card">
                     <div class="weather-header">
                         <h3>Clima Actual</h3>
-                        <div class="weather-icon" id="weather-icon-element"><i class="fas fa-spinner fa-spin"></i></div>
+                        <div class="weather-icon" id="weather-icon-element"><i class="fas fa-cloud-sun"></i></div>
                     </div>
                     <div class="weather-grid">
                         <div class="weather-item">
                             <span class="weather-emoji"><i class="fas fa-thermometer-half"></i></span>
-                            <div class="weather-value" id="weather-temp">--°</div>
+                            <div class="weather-value" id="weather-temp">15°</div>
                             <div class="weather-label">Temperatura</div>
                         </div>
                         <div class="weather-item">
                             <span class="weather-emoji"><i class="fas fa-tint"></i></span>
-                            <div class="weather-value" id="weather-humidity">--%</div>
+                            <div class="weather-value" id="weather-humidity">82%</div>
                             <div class="weather-label">Humedad</div>
                         </div>
                         <div class="weather-item">
                             <span class="weather-emoji"><i class="fas fa-wind"></i></span>
-                            <div class="weather-value" id="weather-wind">--</div>
+                            <div class="weather-value" id="weather-wind">5</div>
                             <div class="weather-label">km/h</div>
                         </div>
                     </div>
-                    <div id="weather-location" style="text-align: center; margin-top: 15px; font-size: 0.875rem; opacity: 0.8;">Obteniendo ubicación...</div>
+                    <div id="weather-location" style="text-align: center; margin-top: 15px; font-size: 0.875rem; opacity: 0.8;">Clima para: Lima, Perú</div>
                 </section>
 
                 <section class="quick-actions">
@@ -75,7 +77,68 @@
                         <h3 class="section-title">Mis Plantas</h3>
                     </div>
                     <div id="plants-list-container" class="plants-list">
-                        <!-- El contenido se cargará dinámicamente -->
+                        <!-- Prompt de registro mejorado -->
+                        <div style="
+                            text-align: center; 
+                            padding: 3rem 2rem;
+                            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
+                            border-radius: var(--border-radius-xl);
+                            margin: 1rem 0;
+                            color: white;
+                            position: relative;
+                            overflow: hidden;
+                            box-shadow: var(--shadow-xl);
+                        ">
+                            <div style="position: relative; z-index: 2;">
+                                <div style="margin-bottom: 1.5rem;">
+                                    <i class="fas fa-lock" style="font-size: 4rem; margin-bottom: 1rem; display: block; opacity: 0.9;"></i>
+                                </div>
+                                <h3 style="margin-bottom: 1rem; font-size: 1.5rem; font-weight: 700;">
+                                    🌱 ¡Únete a AgroSync!
+                                </h3>
+                                <p style="margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.95; line-height: 1.6;">
+                                    Para gestionar tus plantas necesitas una cuenta.<br>
+                                    <strong>Es gratis</strong> y solo toma unos segundos.
+                                </p>
+                                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: var(--border-radius-lg); margin-bottom: 2rem; backdrop-filter: blur(10px);">
+                                    <h4 style="margin-bottom: 1rem; font-size: 1.1rem;">Con tu cuenta podrás:</h4>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; text-align: left;">
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <i class="fas fa-seedling" style="color: #10b981; font-size: 1.2rem;"></i>
+                                            <span>Añadir tus plantas</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <i class="fas fa-chart-line" style="color: #10b981; font-size: 1.2rem;"></i>
+                                            <span>Monitorear su salud</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <i class="fas fa-robot" style="color: #10b981; font-size: 1.2rem;"></i>
+                                            <span>Usar el asistente IA</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <i class="fas fa-bell" style="color: #10b981; font-size: 1.2rem;"></i>
+                                            <span>Recibir alertas</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                                    <button onclick="window.location.href='register.html'" 
+                                            style="background: white; color: var(--primary-blue); border: none; padding: 1rem 2rem; 
+                                                   border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 700;
+                                                   transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem;
+                                                   box-shadow: 0 8px 25px rgba(0,0,0,0.2); font-size: 1.1rem;">
+                                        <i class="fas fa-user-plus"></i> Crear Cuenta Gratis
+                                    </button>
+                                    <button onclick="window.location.href='login.html'" 
+                                            style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 1rem 2rem; 
+                                                   border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 600;
+                                                   transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem;
+                                                   backdrop-filter: blur(10px); font-size: 1rem;">
+                                        <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -102,7 +165,7 @@
             </main>
         </div>
 
-        <!-- Page: Diagnosis -->
+        <!-- Otras páginas ocultas por defecto -->
         <div id="diagnosis" class="page">
             <main class="main-content">
                 <div class="page-header">
@@ -115,35 +178,45 @@
                             <span class="camera-emoji"><i class="fas fa-camera-retro"></i></span>
                             <p>Apunta a la hoja afectada y toma una foto clara.</p>
                         </div>
-                        <button class="camera-btn" onclick="simulateCamera(event)"><i class="fas fa-camera"></i> Tomar Foto</button>
+                        <button class="camera-btn" onclick="alert('Función de cámara en desarrollo')"><i class="fas fa-camera"></i> Tomar Foto</button>
                     </div>
                 </section>
-                 <section class="card">
-                    <div class="section-header">
-                        <span class="section-emoji"><i class="fas fa-microscope"></i></span>
-                        <h3 class="section-title">Resultados del Análisis</h3>
-                    </div>
-                    <div class="analysis-results">
-                         <div class="analysis-card analysis-warning">
-                            <div class="analysis-header">
-                                <span class="analysis-emoji"><i class="fas fa-exclamation-triangle"></i></span>
-                                <h4 class="analysis-title">Riesgo Detectado</h4>
-                            </div>
-                            <p>Probabilidad de pulgón en los próximos 7 días: 75%</p>
+            </main>
+        </div>
+
+        <div id="assistant" class="page">
+            <main class="main-content">
+                <div class="page-header">
+                    <h2><i class="fas fa-comments"></i> Chatea con AgriBot</h2>
+                    <p>Resuelve tus dudas sobre jardinería y agricultura.</p>
+                </div>
+                <section class="card" style="padding: 2rem;">
+                    <div style="text-align: center; padding: 3rem 2rem;">
+                        <i class="fas fa-lock" style="font-size: 3rem; color: var(--primary-blue); margin-bottom: 1rem;"></i>
+                        <h3 style="margin-bottom: 1rem; color: var(--gray-800);">Acceso Restringido</h3>
+                        <p style="margin-bottom: 2rem; color: var(--gray-600);">
+                            Para chatear con AgriBot necesitas una cuenta en AgroSync.
+                        </p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <a href="login.html" style="background: var(--primary-blue); color: white; padding: 0.75rem 1.5rem; border-radius: var(--border-radius); text-decoration: none; font-weight: 600;">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </a>
+                            <a href="register.html" style="background: var(--success); color: white; padding: 0.75rem 1.5rem; border-radius: var(--border-radius); text-decoration: none; font-weight: 600;">
+                                <i class="fas fa-user-plus"></i> Registrarse
+                            </a>
                         </div>
                     </div>
                 </section>
             </main>
         </div>
 
-        <!-- Page: Compost Calculator -->
         <div id="compost" class="page">
             <main class="main-content">
-                 <div class="page-header">
+                <div class="page-header">
                     <h2><i class="fas fa-calculator"></i> Calculadora de Compostaje</h2>
                     <p>Planifica tu compostaje para obtener el mejor abono.</p>
                 </div>
-                 <section class="card">
+                <section class="card">
                     <div class="section-header">
                         <span class="section-emoji"><i class="fas fa-balance-scale"></i></span>
                         <h3 class="section-title">Ingresa tus Datos</h3>
@@ -151,222 +224,95 @@
                     <div class="compost-calculator-input">
                         <label for="compost-amount">Cantidad de compost deseada (kg):</label>
                         <input type="number" id="compost-amount" value="1" min="0.5" step="0.5">
-                        <button id="calculate-compost-btn" class="action-btn" style="margin-top: 1rem; width: 100%;"><i class="fas fa-cogs"></i> Calcular</button>
-                    </div>
-                </section>
-                <section id="compost-results-section" class="card" style="display: none;">
-                     <div class="section-header">
-                        <span class="section-emoji"><i class="fas fa-chart-pie"></i></span>
-                        <h3 class="section-title">Resultados Estimados</h3>
-                    </div>
-                    <div class="compost-results">
-                        <h4><i class="fas fa-seedling" style="color:var(--primary-green)"></i> Materiales Verdes (Ricos en Nitrógeno):</h4>
-                        <p id="green-materials-amount">Aproximadamente X kg - Y litros</p>
-                        <p><strong>Ejemplos:</strong> Restos de frutas y verduras, posos de café, recortes de césped fresco, estiércol de herbívoros (conejo, gallina).</p>
-                        <h4 style="margin-top:1.5rem;"><i class="fas fa-leaf" style="color: #8B4513;"></i> Materiales Marrones (Ricos en Carbono):</h4>
-                        <p id="brown-materials-amount">Aproximadamente X kg - Y litros</p>
-                        <p><strong>Ejemplos:</strong> Hojas secas, ramas pequeñas trituradas, cartón sin tinta (trozos pequeños), paja, serrín (de madera no tratada).</p>
-                        <h4 style="margin-top:1.5rem;"><i class="fas fa-clock"></i> Tiempo Estimado de Fermentación:</h4>
-                        <p id="fermentation-time">Entre X y Y semanas (varía según método y cuidado).</p>
-                        <h4 style="margin-top:1.5rem;"><i class="fas fa-hand-holding-heart"></i> Cuidados Esenciales:</h4>
-                        <ul id="compost-care-tips">
-                            <li>Mantener una buena relación Carbono/Nitrógeno (aprox. 25-30 partes de Carbono por 1 de Nitrógeno en peso, o 2-3 partes de Marrones por 1 de Verdes en volumen).</li>
-                            <li>Asegurar una humedad adecuada (como una esponja escurrida).</li>
-                            <li>Airear la pila regularmente (cada 1-2 semanas) para oxigenar.</li>
-                            <li>Trozar los materiales grandes para acelerar la descomposición.</li>
-                            <li>Evitar carnes, lácteos, grasas, plantas enfermas o con semillas de malezas invasoras.</li>
-                        </ul>
-                        <h4 style="margin-top:1.5rem;"><i class="fas fa-trophy"></i> Logros de Compostaje:</h4>
-                        <ul id="compost-achievements">
-                           <li><i class="fas fa-award" style="color:var(--warning)"></i> ¡Primer compost iniciado!</li>
-                           <li><i class="fas fa-award" style="color:var(--warning)"></i> ¡Primera volteada exitosa!</li>
-                           <li><i class="fas fa-award" style="color:var(--success)"></i> ¡Compost maduro listo para usar!</li>
-                        </ul>
-                    </div>
-                </section>
-            </main>
-        </div>
-        
-        <!-- Page: Assistant -->
-        <div id="assistant" class="page">
-            <main class="main-content">
-                 <div class="page-header">
-                    <h2><i class="fas fa-comments"></i> Chatea con AgriBot</h2>
-                    <p>Resuelve tus dudas sobre jardinería y agricultura.</p>
-                </div>
-                <section class="card" style="padding: 0; overflow:visible;">
-                    <div class="chat-interface"> 
-                        <div class="chat-messages">
-                            <!-- Los mensajes se cargarán dinámicamente según el estado del usuario -->
-                        </div>
-                        <div class="chat-input-area">
-                            <input type="text" id="userInput" placeholder="Escribe tu pregunta aquí...">
-                            <button id="sendMessageBtn"><i class="fas fa-paper-plane"></i> Enviar</button>
-                        </div>
+                        <button onclick="alert('Calculadora en desarrollo')" class="action-btn" style="margin-top: 1rem; width: 100%;"><i class="fas fa-cogs"></i> Calcular</button>
                     </div>
                 </section>
             </main>
         </div>
 
-        <!-- Page: Profile -->
         <div id="profile" class="page">
             <main class="main-content">
-                <div id="profile-logged-in-content" style="display: none;">
-                    <section class="profile-info">
-                        <div class="profile-avatar" id="profile-avatar-initials">--</div>
-                        <h3 id="profile-username">Nombre de Usuario</h3>
-                        <p class="profile-level" id="profile-email">correo@ejemplo.com</p>
-                        <button id="logout-btn" class="action-btn danger" style="margin-top: 1.5rem; background: var(--danger);"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
-                    </section>
-                    <section class="card">
-                        <div class="section-header">
-                            <span class="section-emoji"><i class="fas fa-plus-circle"></i></span>
-                            <h3 class="section-title">Añadir Nueva Planta</h3>
-                        </div>
-                        <form id="add-plant-form" class="add-plant-form">
-                            <div class="form-group">
-                                <label for="plant-name">Nombre de la Planta:</label>
-                                <input type="text" id="plant-name" name="plant_name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="plant-description">Descripción (opcional):</label>
-                                <textarea id="plant-description" name="plant_description" rows="3"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="plant-health">Estado de Salud Inicial:</label>
-                                <select id="plant-health" name="plant_health" required>
-                                    <option value="Saludable" selected>Saludable</option>
-                                    <option value="Advertencia">Advertencia</option>
-                                    <option value="Peligro">Peligro</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="action-btn" style="width: 100%; margin-top: 1rem;">
-                                <i class="fas fa-save"></i> Guardar Planta
-                            </button>
-                        </form>
-                        <div id="add-plant-message" class="form-message" style="margin-top: 1rem;"></div>
-                    </section>
+                <div class="page-header">
+                    <h2><i class="fas fa-user-circle"></i> Mi Perfil</h2>
+                    <p>Inicia sesión o regístrate para acceder a todas las funciones.</p>
                 </div>
-                <div id="profile-guest-content" style="display: none;">
-                    <div class="page-header">
-                        <h2><i class="fas fa-user-circle"></i> Mi Perfil</h2>
-                        <p>Inicia sesión o regístrate para acceder a todas las funciones.</p>
-                    </div>
-                    <section class="quick-actions">
-                        <button class="action-btn primary" onclick="window.location.href='login.html'">
-                            <span class="action-emoji"><i class="fas fa-sign-in-alt"></i></span>
-                            <span class="action-text">Iniciar Sesión</span>
-                        </button>
-                        <button class="action-btn success" onclick="window.location.href='register.html'">
-                             <span class="action-emoji"><i class="fas fa-user-plus"></i></span>
-                            <span class="action-text">Crear Cuenta</span>
-                        </button>
-                    </section>
-                </div>
-                <section class="stats-grid" id="profile-stats-grid" style="display:none;"> 
-                    <!-- ... contenido de stats ... -->
-                </section>
-                <section class="card" id="profile-achievements-card" style="display:none;"> 
-                    <!-- ... contenido de logros ... -->
-                </section>
-                <section class="card">
-                    <div class="section-header">
-                        <span class="section-emoji"><i class="fas fa-cog"></i></span>
-                        <h3 class="section-title">Configuración General</h3>
-                    </div>
-                    <div class="settings-list">
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <h4>Ubicación</h4>
-                                <p>Permitir acceso a ubicación para clima local</p>
-                            </div>
-                            <div class="toggle-switch" id="locationToggleContainer" onclick="toggleLocation()">
-                                <input type="checkbox" id="locationToggle" class="sr-only" checked>
-                                <div class="toggle-circle"></div>
-                            </div>
-                        </div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <h4>Modo Oscuro</h4>
-                                <p>Cambiar entre tema claro y oscuro</p>
-                            </div>
-                            <div class="toggle-switch" id="darkModeToggleContainer" onclick="toggleDarkMode()">
-                                <input type="checkbox" id="darkModeToggle" class="sr-only">
-                                <div class="toggle-circle"></div>
-                            </div>
-                        </div>
-                    </div>
+                <section class="quick-actions">
+                    <button class="action-btn primary" onclick="window.location.href='login.html'">
+                        <span class="action-emoji"><i class="fas fa-sign-in-alt"></i></span>
+                        <span class="action-text">Iniciar Sesión</span>
+                    </button>
+                    <button class="action-btn success" onclick="window.location.href='register.html'">
+                         <span class="action-emoji"><i class="fas fa-user-plus"></i></span>
+                        <span class="action-text">Crear Cuenta</span>
+                    </button>
                 </section>
             </main>
         </div>
     </div> 
 
-    <!-- Contenedor para la Navegación Inferior -->
+    <!-- Navegación inferior -->
     <nav class="bottom-nav" id="main-bottom-nav">
-        <!-- El contenido de la navegación se cargará aquí por JavaScript -->
+        <button class="nav-item active" onclick="showPage('home')">
+            <span class="nav-emoji"><i class="fas fa-home"></i></span>
+            <span class="nav-label">Inicio</span>
+        </button>
+        <button class="nav-item" onclick="showPage('diagnosis')">
+            <span class="nav-emoji"><i class="fas fa-stethoscope"></i></span>
+            <span class="nav-label">Diagnóstico</span>
+        </button>
+        <button class="nav-item" onclick="showPage('compost')"> 
+            <span class="nav-emoji"><i class="fas fa-recycle"></i></span>
+            <span class="nav-label">Compost</span>
+        </button>
+         <button class="nav-item" onclick="showPage('assistant')">
+            <span class="nav-emoji"><i class="fas fa-comments"></i></span>
+            <span class="nav-label">Asistente</span>
+        </button>
+        <button class="nav-item" onclick="showPage('profile')">
+            <span class="nav-emoji"><i class="fas fa-user-circle"></i></span>
+            <span class="nav-label">Perfil</span>
+        </button>
     </nav>
 
-    <!-- JavaScript - Verificar que todos los archivos existan -->
-    <!-- Orden correcto de carga -->
+    <!-- JavaScript simple y funcional -->
     <script>
-        // Cargar scripts de forma segura con verificación de errores
-        function loadScript(src, callback) {
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = callback || function() { console.log('✅ Cargado:', src); };
-            script.onerror = function() { console.error('❌ Error cargando:', src); };
-            document.head.appendChild(script);
-        }
-
-        // Cargar scripts en orden secuencial
-        const scripts = [
-            'js/ui.js',
-            'js/auth.js', 
-            'js/weather.js',
-            'js/camera.js',
-            'js/compost.js',
-            'js/assistant.js',
-            'js/plants.js',
-            'js/main.js'
-        ];
-
-        let loadedScripts = 0;
-        
-        function loadNextScript() {
-            if (loadedScripts < scripts.length) {
-                loadScript(scripts[loadedScripts], function() {
-                    loadedScripts++;
-                    loadNextScript();
-                });
-            } else {
-                console.log('🎉 Todos los scripts cargados correctamente');
+        // Función básica para cambiar páginas
+        function showPage(pageId) {
+            console.log('Mostrando página:', pageId);
+            
+            // Ocultar todas las páginas
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Mostrar página seleccionada
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            // Actualizar navegación
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Marcar item activo
+            const activeNavItem = document.querySelector(`[onclick="showPage('${pageId}')"]`);
+            if (activeNavItem) {
+                activeNavItem.classList.add('active');
             }
         }
 
-        // Iniciar carga cuando el DOM esté listo
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadNextScript);
-        } else {
-            loadNextScript();
-        }
-
-        // Función para toggle de ubicación (definida aquí para evitar errores)
+        // Función de toggle de ubicación
         function toggleLocation() {
-            const toggleContainer = document.getElementById('locationToggleContainer');
-            const checkbox = document.getElementById('locationToggle');
-            if (toggleContainer && checkbox) {
-                checkbox.checked = !checkbox.checked;
-                if (checkbox.checked) {
-                    toggleContainer.classList.add('active');
-                } else {
-                    toggleContainer.classList.remove('active');
-                }
-                // Recargar el clima con la nueva configuración
-                if (typeof getGeoLocationAndFetchWeather === 'function') {
-                    getGeoLocationAndFetchWeather();
-                }
-            }
+            console.log('Toggle ubicación');
         }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('AgroSync cargado correctamente');
+            showPage('home');
+        });
     </script>
 </body>
 </html>
