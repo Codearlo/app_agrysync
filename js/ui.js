@@ -8,6 +8,7 @@ const pageSpecificHeaders = {
     profile: { title: "Mi Perfil", subtitle: "Agricultor Urbano Apasionado" } 
 };
 
+// Esta función ya no es necesaria si tienes el contenido estático, pero la mantengo para compatibilidad
 async function loadAppHeaderStructure() {
     const headerContainer = document.getElementById('main-app-header');
     if (!headerContainer) {
@@ -15,14 +16,14 @@ async function loadAppHeaderStructure() {
         return false;
     }
     
-    // Verificar si ya existe el contenido del header
-    const existingHeaderContent = headerContainer.querySelector('.header-content');
-    if (existingHeaderContent) {
-        console.log("UI LOG: Header ya existe, no se sobrescribe.");
+    // Si ya tiene contenido, no hacer nada
+    const existingContent = headerContainer.querySelector('.header-content');
+    if (existingContent) {
+        console.log("UI LOG: Header estático encontrado.");
         return true;
     }
     
-    // Solo crear el header si no existe
+    // Solo como respaldo si no hay contenido estático
     const headerHTML = `
         <div class="header-content">
             <div class="app-title" id="header-app-title">AgroSync <i class="fas fa-leaf"></i></div>
@@ -32,10 +33,11 @@ async function loadAppHeaderStructure() {
     `;
     
     headerContainer.innerHTML = headerHTML;
-    console.log("UI LOG: Header cargado dinámicamente.");
+    console.log("UI LOG: Header creado dinámicamente como respaldo.");
     return true;
 }
 
+// Esta función ya no es necesaria si tienes el contenido estático, pero la mantengo para compatibilidad
 async function loadBottomNavigationStructure() {
     const navContainer = document.getElementById('main-bottom-nav');
     if (!navContainer) {
@@ -43,14 +45,14 @@ async function loadBottomNavigationStructure() {
         return false;
     }
     
-    // Verificar si ya existe el contenido de navegación
+    // Si ya tiene contenido, no hacer nada
     const existingNavItems = navContainer.querySelectorAll('.nav-item');
     if (existingNavItems.length > 0) {
-        console.log("UI LOG: Navegación ya existe, no se sobrescribe.");
+        console.log("UI LOG: Navegación estática encontrada.");
         return true;
     }
     
-    // Solo crear la navegación si no existe
+    // Solo como respaldo si no hay contenido estático
     const navHTML = `
         <button class="nav-item active" onclick="showPage('home')">
             <span class="nav-emoji"><i class="fas fa-home"></i></span>
@@ -75,21 +77,36 @@ async function loadBottomNavigationStructure() {
     `;
     
     navContainer.innerHTML = navHTML;
-    console.log("UI LOG: Navegación cargada dinámicamente.");
+    console.log("UI LOG: Navegación creada dinámicamente como respaldo.");
     return true;
 }
 
 function updateAppHeader(pageId, notificationCount = null) {
-    const headerTitleEl = document.getElementById('header-app-title') || document.querySelector('.app-title');
-    const headerSubtitleEl = document.getElementById('header-app-subtitle') || document.querySelector('.app-subtitle');
-    const notificationBadgeEl = document.getElementById('header-notification-badge') || document.querySelector('.notification-badge');
+    // Buscar elementos en diferentes ubicaciones posibles
+    const headerTitleEl = document.getElementById('header-app-title') || 
+                         document.querySelector('.app-title') ||
+                         document.querySelector('#main-app-header .app-title');
+    
+    const headerSubtitleEl = document.getElementById('header-app-subtitle') || 
+                            document.querySelector('.app-subtitle') ||
+                            document.querySelector('#main-app-header .app-subtitle');
+    
+    const notificationBadgeEl = document.getElementById('header-notification-badge') || 
+                               document.querySelector('.notification-badge') ||
+                               document.querySelector('#main-app-header .notification-badge');
 
     if (!headerTitleEl || !headerSubtitleEl) {
-        console.warn("UI WARNING: Elementos del header (título o subtítulo) no encontrados para actualizar.");
+        console.warn("UI WARNING: Elementos del header no encontrados para actualizar.");
+        console.log("Título encontrado:", !!headerTitleEl);
+        console.log("Subtítulo encontrado:", !!headerSubtitleEl);
         return;
     }
     
-    const headerData = pageSpecificHeaders[pageId] || { title: "AgroSync <i class=\"fas fa-leaf\"></i>", subtitle: "Tu jardín inteligente" };
+    const headerData = pageSpecificHeaders[pageId] || { 
+        title: "AgroSync <i class=\"fas fa-leaf\"></i>", 
+        subtitle: "Tu jardín inteligente" 
+    };
+    
     headerTitleEl.innerHTML = headerData.title; 
     headerSubtitleEl.textContent = headerData.subtitle;
     
@@ -109,15 +126,15 @@ function showPage(pageId) {
     const activePage = document.getElementById(pageId);
     if (activePage) {
         activePage.classList.add('active');
+        
+        // Scroll al inicio
         const mainContent = activePage.querySelector('.main-content') || activePage;
         if (mainContent) mainContent.scrollTop = 0;
         
-        // Obtener el badge de notificaciones
-        const badge = document.getElementById('header-notification-badge') || document.querySelector('.notification-badge');
-        const count = badge ? parseInt(badge.textContent) : 0;
-        updateAppHeader(pageId, isNaN(count) ? 0 : count);
+        // Actualizar header
+        updateAppHeader(pageId);
         
-        // Actualizar el asistente cuando se navega a la página del asistente
+        // Actualizar el asistente cuando se navega a esa página
         if (pageId === 'assistant' && typeof updateAssistantForUser === 'function') {
             updateAssistantForUser();
         }
@@ -125,44 +142,37 @@ function showPage(pageId) {
         console.warn(`UI WARNING: Página con ID '${pageId}' no encontrada.`);
     }
 
-    // Actualizar navegación
-    const navContainer = document.getElementById('main-bottom-nav');
-    if (navContainer) { 
-        navContainer.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active');
-            const onclickAttr = item.getAttribute('onclick');
-            if (onclickAttr && onclickAttr.includes(`showPage('${pageId}')`)) {
-                item.classList.add('active');
-            }
-        });
-    }
+    // Actualizar navegación activa
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.classList.remove('active');
+        const onclickAttr = item.getAttribute('onclick');
+        if (onclickAttr && onclickAttr.includes(`showPage('${pageId}')`)) {
+            item.classList.add('active');
+        }
+    });
 }
 
 function initializeDarkMode() {
     const savedDarkMode = localStorage.getItem('darkMode');
     const toggleContainer = document.getElementById('darkModeToggleContainer');
     const checkbox = document.getElementById('darkModeToggle'); 
-    if (!toggleContainer || !checkbox) {
-        console.warn("UI WARNING: Elementos del toggle de modo oscuro no encontrados.");
-        return;
-    }
+    
     if (savedDarkMode === 'enabled') {
         if(document.body) document.body.classList.add('dark-mode');
-        toggleContainer.classList.add('active');
-        checkbox.checked = true;
+        if (toggleContainer) toggleContainer.classList.add('active');
+        if (checkbox) checkbox.checked = true;
     } else {
         if(document.body) document.body.classList.remove('dark-mode');
-        toggleContainer.classList.remove('active');
-        checkbox.checked = false;
+        if (toggleContainer) toggleContainer.classList.remove('active');
+        if (checkbox) checkbox.checked = false;
     }
 }
 
 function toggleDarkMode() {
     const body = document.body;
-    if (!body || !body.classList) {
-        console.error("UI ERROR: document.body no disponible en toggleDarkMode.");
-        return;
-    }
+    if (!body) return;
+    
     body.classList.toggle('dark-mode');
     const isDarkMode = body.classList.contains('dark-mode');
     localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
@@ -178,17 +188,20 @@ function toggleDarkMode() {
 function initializeLocationToggle() {
     const toggleContainer = document.getElementById('locationToggleContainer');
     const checkbox = document.getElementById('locationToggle');
-    if (!toggleContainer || !checkbox) {
-        console.warn("UI WARNING: Elementos del toggle de ubicación no encontrados.");
-        return;
+    if (checkbox && checkbox.checked && toggleContainer) {
+        toggleContainer.classList.add('active');
     }
-    checkbox.checked ? toggleContainer.classList.add('active') : toggleContainer.classList.remove('active');
 }
 
 function initializeTouchFeedback() {
-    document.querySelectorAll('button, .nav-item, .action-btn, .toggle-switch').forEach(element => {
-        element.addEventListener('touchstart', function() { this.style.transform = 'scale(0.97)'; }, { passive: true });
-        element.addEventListener('touchend', function() { this.style.transform = 'scale(1)'; });
+    const elements = document.querySelectorAll('button, .nav-item, .action-btn, .toggle-switch');
+    elements.forEach(element => {
+        element.addEventListener('touchstart', function() { 
+            this.style.transform = 'scale(0.97)'; 
+        }, { passive: true });
+        element.addEventListener('touchend', function() { 
+            this.style.transform = 'scale(1)'; 
+        });
     });
 }
 
