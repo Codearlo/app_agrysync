@@ -42,20 +42,20 @@ async function analyzePlantHealth(image) {
             const errorData = await response.json().catch(() => ({ error: { message: "No se pudo obtener detalle del error." } }));
             console.error("Error de API Gemini:", response.status, errorData);
             let errorMessage = `Lo siento, no pude procesar tu solicitud en este momento (Error: ${response.status}) 😔.`;
-            addMessageToChat(errorMessage, 'bot-error');
+            if (chatMessagesContainerAssistant) addMessageToChat(errorMessage, 'bot-error');
             return;
         }
 
         const result = await response.json();
         if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
-            addMessageToChat(result.candidates[0].content.parts[0].text, 'bot');
+            if (chatMessagesContainerAssistant) addMessageToChat(result.candidates[0].content.parts[0].text, 'bot');
         } else {
             console.error("Respuesta inesperada de la API de Gemini:", result);
-            addMessageToChat("Recibí una respuesta inesperada 😕. Por favor, intenta reformular tu pregunta o inténtalo más tarde.", 'bot-error');
+            if (chatMessagesContainerAssistant) addMessageToChat("Recibí una respuesta inesperada 😕. Por favor, intenta reformular tu pregunta o inténtalo más tarde.", 'bot-error');
         }
     } catch (error) {
         console.error("Error al llamar a la API de Gemini:", error);
-        addMessageToChat("Hubo un problema de conexión al intentar obtener una respuesta 🌐🔌. Verifica tu conexión a internet e inténtalo de nuevo.", 'bot-error');
+        if (chatMessagesContainerAssistant) addMessageToChat("Hubo un problema de conexión al intentar obtener una respuesta 🌐🔌. Verifica tu conexión a internet e inténtalo de nuevo.", 'bot-error');
     }
 }
 
