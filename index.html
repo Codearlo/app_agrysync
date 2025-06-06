@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>AgroSync</title>
     
+    <!-- Favicon para evitar error 404 -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+    
     <!-- CSS -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/home.css">
@@ -303,18 +306,51 @@
         <!-- El contenido de la navegación se cargará aquí por JavaScript -->
     </nav>
 
-    <!-- JavaScript - Carga normal sin cache complejo -->
-    <script src="js/ui.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/weather.js"></script>
-    <script src="js/camera.js"></script>
-    <script src="js/compost.js"></script>
-    <script src="js/assistant.js"></script>
-    <script src="js/plants.js"></script>
-    <script src="js/main.js"></script>
-    
+    <!-- JavaScript - Verificar que todos los archivos existan -->
+    <!-- Orden correcto de carga -->
     <script>
-        // Función para toggle de ubicación
+        // Cargar scripts de forma segura con verificación de errores
+        function loadScript(src, callback) {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = callback || function() { console.log('✅ Cargado:', src); };
+            script.onerror = function() { console.error('❌ Error cargando:', src); };
+            document.head.appendChild(script);
+        }
+
+        // Cargar scripts en orden secuencial
+        const scripts = [
+            'js/ui.js',
+            'js/auth.js', 
+            'js/weather.js',
+            'js/camera.js',
+            'js/compost.js',
+            'js/assistant.js',
+            'js/plants.js',
+            'js/main.js'
+        ];
+
+        let loadedScripts = 0;
+        
+        function loadNextScript() {
+            if (loadedScripts < scripts.length) {
+                loadScript(scripts[loadedScripts], function() {
+                    loadedScripts++;
+                    loadNextScript();
+                });
+            } else {
+                console.log('🎉 Todos los scripts cargados correctamente');
+            }
+        }
+
+        // Iniciar carga cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadNextScript);
+        } else {
+            loadNextScript();
+        }
+
+        // Función para toggle de ubicación (definida aquí para evitar errores)
         function toggleLocation() {
             const toggleContainer = document.getElementById('locationToggleContainer');
             const checkbox = document.getElementById('locationToggle');
