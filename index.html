@@ -6,13 +6,12 @@
     <title>AgroSync</title>
     <!-- CSS Base y Variables -->
     <link rel="stylesheet" href="css/base.css">
-    <!-- CSS Componentes/Secciones (navigation.css ya no es necesario aquí) -->
+    <!-- CSS Componentes/Secciones -->
     <link rel="stylesheet" href="css/home.css">
     <link rel="stylesheet" href="css/diagnosis.css">
     <link rel="stylesheet" href="css/compost.css">
     <link rel="stylesheet" href="css/assistant.css">
     <link rel="stylesheet" href="css/profile.css">
-    <!-- <link rel="stylesheet" href="css/navigation.css"> NO NECESARIO SI ESTILOS ESTÁN EN EL INCLUDE -->
     <link rel="stylesheet" href="css/auth.css"> 
     <link rel="stylesheet" href="css/dark_mode.css">
     <link rel="stylesheet" href="css/responsive_utilities.css">
@@ -23,7 +22,7 @@
     <div class="app-container">
         <!-- Contenedor para el Header Dinámico -->
         <header class="app-header" id="main-app-header">
-            <!-- El contenido del header (incluyendo sus estilos) se cargará aquí por JavaScript -->
+            <!-- El contenido del header se cargará aquí por JavaScript -->
         </header>
 
         <!-- Page: Home -->
@@ -274,15 +273,35 @@
                         <h3 class="section-title">Configuración General</h3>
                     </div>
                     <div class="settings-list">
-                        <!-- ... contenido de settings ... -->
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Ubicación</h4>
+                                <p>Permitir acceso a ubicación para clima local</p>
+                            </div>
+                            <div class="toggle-switch" id="locationToggleContainer" onclick="toggleLocation()">
+                                <input type="checkbox" id="locationToggle" class="sr-only" checked>
+                                <div class="toggle-circle"></div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Modo Oscuro</h4>
+                                <p>Cambiar entre tema claro y oscuro</p>
+                            </div>
+                            <div class="toggle-switch" id="darkModeToggleContainer" onclick="toggleDarkMode()">
+                                <input type="checkbox" id="darkModeToggle" class="sr-only">
+                                <div class="toggle-circle"></div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </main>
         </div>
     </div> 
 
+    <!-- Contenedor para la Navegación Inferior -->
     <nav class="bottom-nav" id="main-bottom-nav">
-        <!-- El contenido de la navegación (incluyendo sus estilos) se cargará aquí por JavaScript -->
+        <!-- El contenido de la navegación se cargará aquí por JavaScript -->
     </nav>
 
     <!-- JavaScript Modularizado -->
@@ -293,6 +312,26 @@
     <script src="js/auth.js"></script> 
     <script src="js/assistant.js"></script>
     <script src="js/plants.js"></script> 
-    <script src="js/main.js"></script> 
+    <script src="js/main.js"></script>
+    
+    <script>
+        // Función para toggle de ubicación
+        function toggleLocation() {
+            const toggleContainer = document.getElementById('locationToggleContainer');
+            const checkbox = document.getElementById('locationToggle');
+            if (toggleContainer && checkbox) {
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    toggleContainer.classList.add('active');
+                } else {
+                    toggleContainer.classList.remove('active');
+                }
+                // Recargar el clima con la nueva configuración
+                if (typeof getGeoLocationAndFetchWeather === 'function') {
+                    getGeoLocationAndFetchWeather();
+                }
+            }
+        }
+    </script>
 </body>
 </html>

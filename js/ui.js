@@ -14,28 +14,94 @@ async function loadAppHeaderStructure() {
         console.error("UI ERROR: Contenedor #main-app-header no encontrado.");
         return false;
     }
-    const headerPath = 'includes/app_header.html'; // Ruta relativa desde index.html
-    console.log(`UI LOG: Intentando fetch header desde: ${headerPath}`);
-    try {
-        const response = await fetch(headerPath); 
-        if (!response.ok) {
-            console.error(`UI ERROR: Fetch fallido para ${headerPath}. Estado: ${response.status} ${response.statusText}. URL completa: ${response.url}`);
-            throw new Error(`No se pudo cargar ${headerPath}.`);
-        }
-        const headerHtml = await response.text();
-        if (!headerHtml || headerHtml.trim() === "") {
-            console.warn(`UI WARNING: ${headerPath} está vacío o no es HTML válido.`);
-            headerContainer.innerHTML = "<div class='header-content'><p style='color:white;text-align:center;'>Header vacío.</p></div>";
-            return false;
-        }
-        headerContainer.innerHTML = headerHtml;
-        console.log("UI LOG: Header cargado.");
-        return true; 
-    } catch (error) {
-        console.error(`UI ERROR: Excepción cargando header desde ${headerPath}:`, error);
-        headerContainer.innerHTML = "<div class='header-content'><p style='color:white;text-align:center;'>Error crítico header.</p></div>";
-        return false;
-    }
+    
+    // Crear el header directamente en lugar de cargar desde archivo
+    const headerHTML = `
+        <style>
+            .app-header {
+                background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-blue) 100%);
+                color: var(--white);
+                padding: 1.25rem 1rem; 
+                min-height: 70px; 
+                display: flex; 
+                align-items: center; 
+                position: sticky; 
+                top: 0;
+                z-index: 100; 
+                box-shadow: var(--shadow-lg);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .header-content {
+                max-width: 1200px; 
+                margin: 0 auto; 
+                position: relative; 
+                width: 100%; 
+                display: flex; 
+                flex-direction: column; 
+                justify-content: center; 
+            }
+            
+            .app-title {
+                font-size: 1.75rem; 
+                font-weight: 800;
+                margin-bottom: 0.15rem; 
+                letter-spacing: -0.025em;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+            .app-title i { margin-left: 0.5rem; }
+            
+            .app-subtitle {
+                font-size: 0.9rem; 
+                opacity: 0.9;
+                font-weight: 500;
+            }
+            
+            .notification-badge {
+                position: absolute;
+                top: 50%; 
+                transform: translateY(-50%);
+                right: 1rem; 
+                background: var(--danger);
+                color: var(--white);
+                border-radius: 50%;
+                width: 26px; 
+                height: 26px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.8rem;
+                font-weight: 700;
+                box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+                animation: pulseHeaderBadge 2s infinite;
+                border: 2px solid var(--white); 
+            }
+            
+            @keyframes pulseHeaderBadge {
+                0%, 100% { 
+                    transform: scale(1) translateY(-50%); 
+                    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+                }
+                50% { 
+                    transform: scale(1.15) translateY(-50%); 
+                    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.6);
+                }
+            }
+            
+            body.dark-mode .app-header {
+                background: linear-gradient(135deg, var(--secondary-green) 0%, var(--secondary-blue) 100%);
+            }
+        </style>
+        <div class="header-content">
+            <div class="app-title" id="header-app-title">AgroSync <i class="fas fa-leaf"></i></div>
+            <div class="app-subtitle" id="header-app-subtitle">Tu jardín inteligente</div>
+            <div class="notification-badge" id="header-notification-badge" style="display: none;">0</div>
+        </div>
+    `;
+    
+    headerContainer.innerHTML = headerHTML;
+    console.log("UI LOG: Header cargado directamente.");
+    return true;
 }
 
 async function loadBottomNavigationStructure() {
@@ -44,28 +110,154 @@ async function loadBottomNavigationStructure() {
         console.error("UI ERROR: Contenedor #main-bottom-nav no encontrado.");
         return false;
     }
-    const navPath = 'includes/bottom_navigation.html'; // Ruta relativa desde index.html
-    console.log(`UI LOG: Intentando fetch navegación desde: ${navPath}`);
-    try {
-        const response = await fetch(navPath);
-        if (!response.ok) {
-            console.error(`UI ERROR: Fetch fallido para ${navPath}. Estado: ${response.status} ${response.statusText}. URL completa: ${response.url}`);
-            throw new Error(`No se pudo cargar ${navPath}.`);
-        }
-        const navHtml = await response.text();
-        if (!navHtml || navHtml.trim() === "") {
-            console.warn(`UI WARNING: ${navPath} está vacío o no es HTML válido.`);
-            navContainer.innerHTML = "<p style='text-align:center;color:var(--danger);'>Nav vacía.</p>";
-            return false;
-        }
-        navContainer.innerHTML = navHtml;
-        console.log("UI LOG: Navegación cargada.");
-        return true; 
-    } catch (error) {
-        console.error(`UI ERROR: Excepción cargando navegación desde ${navPath}:`, error);
-        navContainer.innerHTML = "<p style='text-align:center;color:var(--danger);'>Error crítico nav.</p>";
-        return false;
-    }
+    
+    // Crear la navegación directamente en lugar de cargar desde archivo
+    const navHTML = `
+        <style>
+            .bottom-nav {
+                position: fixed;
+                bottom: 0;
+                width: 100%; 
+                max-width: 1200px; 
+                margin-left: auto;
+                margin-right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                
+                background: rgba(255, 255, 255, 0.97); 
+                backdrop-filter: blur(25px); 
+                -webkit-backdrop-filter: blur(25px);
+                border-top: 1px solid var(--gray-200);
+                display: flex;
+                justify-content: space-around; 
+                padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom)); 
+                z-index: 1000;
+                box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.08); 
+                
+                border-top-left-radius: var(--border-radius-lg); 
+                border-top-right-radius: var(--border-radius-lg); 
+                min-height: 60px; 
+            }
+            
+            .bottom-nav .nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center; 
+                padding: 0.25rem 0.5rem; 
+                background: none;
+                border: none;
+                cursor: pointer;
+                transition: var(--transition);
+                color: var(--gray-500);
+                text-decoration: none;
+                min-width: 60px; 
+                min-height: 50px; 
+                border-radius: var(--border-radius);
+                position: relative; 
+                flex-grow: 1; 
+            }
+            
+            .bottom-nav .nav-item::before {
+                content: '';
+                position: absolute;
+                top: -1px; 
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0; 
+                height: 3px; 
+                background: var(--primary-blue);
+                border-radius: 0 0 3px 3px; 
+                opacity: 0;
+                transition: width 0.3s ease, opacity 0.3s ease;
+            }
+            
+            .bottom-nav .nav-item.active {
+                color: var(--primary-blue);
+            }
+            
+            .bottom-nav .nav-item.active::before {
+                opacity: 1;
+                width: 60%; 
+            }
+            
+            .bottom-nav .nav-item:hover {
+                color: var(--primary-blue);
+                background: rgba(59, 130, 246, 0.05); 
+            }
+            .bottom-nav .nav-item:hover::before {
+                opacity: 0.7;
+                width: 40%;
+            }
+            .bottom-nav .nav-item.active:hover::before {
+                width: 70%; 
+            }
+            
+            .nav-emoji {
+                font-size: 1.5rem; 
+                margin-bottom: 0.25rem; 
+                filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
+                transition: var(--transition);
+                line-height: 1; 
+            }
+            .nav-emoji i { transition: transform 0.3s ease; }
+            
+            .bottom-nav .nav-item:hover .nav-emoji i {
+                transform: scale(1.15) translateY(-2px); 
+            }
+            .bottom-nav .nav-item.active .nav-emoji i {
+                transform: scale(1.1) translateY(-1px);
+            }
+            
+            .nav-label {
+                font-size: 0.6875rem; 
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                line-height: 1.2; 
+            }
+            
+            body.dark-mode .bottom-nav {
+                background: rgba(17, 24, 39, 0.97); 
+                border-top-color: var(--gray-700); 
+            }
+            body.dark-mode .bottom-nav .nav-item {
+                color: var(--gray-500);
+            }
+            body.dark-mode .bottom-nav .nav-item.active {
+                color: var(--primary-blue);
+                background: rgba(59, 130, 246, 0.15);
+            }
+            body.dark-mode .bottom-nav .nav-item:hover {
+                color: var(--primary-blue);
+                background: rgba(59, 130, 246, 0.1);
+            }
+        </style>
+        <button class="nav-item active" onclick="showPage('home')">
+            <span class="nav-emoji"><i class="fas fa-home"></i></span>
+            <span class="nav-label">Inicio</span>
+        </button>
+        <button class="nav-item" onclick="showPage('diagnosis')">
+            <span class="nav-emoji"><i class="fas fa-stethoscope"></i></span>
+            <span class="nav-label">Diagnóstico</span>
+        </button>
+        <button class="nav-item" onclick="showPage('compost')"> 
+            <span class="nav-emoji"><i class="fas fa-recycle"></i></span>
+            <span class="nav-label">Compost</span>
+        </button>
+         <button class="nav-item" onclick="showPage('assistant')">
+            <span class="nav-emoji"><i class="fas fa-comments"></i></span>
+            <span class="nav-label">Asistente</span>
+        </button>
+        <button class="nav-item" onclick="showPage('profile')">
+            <span class="nav-emoji"><i class="fas fa-user-circle"></i></span>
+            <span class="nav-label">Perfil</span>
+        </button>
+    `;
+    
+    navContainer.innerHTML = navHTML;
+    console.log("UI LOG: Navegación cargada directamente.");
+    return true;
 }
 
 function updateAppHeader(pageId, notificationCount = null) {
@@ -74,8 +266,7 @@ function updateAppHeader(pageId, notificationCount = null) {
     const notificationBadgeEl = document.getElementById('header-notification-badge');
 
     if (!headerTitleEl || !headerSubtitleEl || !notificationBadgeEl) {
-        // Este console.warn es útil si la estructura del header se cargó pero faltan estos IDs internos.
-        console.warn("UI WARNING: Elementos internos del header (título, subtítulo o insignia) no encontrados para actualizar. ¿El contenido de app_header.html es correcto y se cargó?");
+        console.warn("UI WARNING: Elementos internos del header (título, subtítulo o insignia) no encontrados para actualizar.");
         return;
     }
     const headerData = pageSpecificHeaders[pageId] || { title: "AgroSync", subtitle: "Bienvenido" };
