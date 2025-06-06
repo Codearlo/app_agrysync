@@ -14,79 +14,125 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    let headerContentLoaded = false;
-    if (typeof loadAppHeaderStructure === 'function') { // ui.js
-        headerContentLoaded = await loadAppHeaderStructure();
-    } else { console.error("loadAppHeaderStructure no definida."); }
+    // Verificar si el header y navegación ya tienen contenido (modo estático)
+    const headerHasContent = mainAppHeaderContainer.querySelector('.header-content') !== null;
+    const navHasContent = mainBottomNavContainer.querySelector('.nav-item') !== null;
 
-    let bottomNavContentLoaded = false;
-    if (typeof loadBottomNavigationStructure === 'function') { // ui.js
-        bottomNavContentLoaded = await loadBottomNavigationStructure();
-    } else { console.error("loadBottomNavigationStructure no definida."); }
+    console.log("Header tiene contenido:", headerHasContent);
+    console.log("Navegación tiene contenido:", navHasContent);
 
-    if (!headerContentLoaded && mainAppHeaderContainer) {
-        mainAppHeaderContainer.innerHTML = "<div class='header-content'><p style='color:white;text-align:center;'>Error header</p></div>";
+    // Solo cargar dinámicamente si no existe contenido estático
+    if (!headerHasContent) {
+        console.log("Cargando header dinámicamente...");
+        if (typeof loadAppHeaderStructure === 'function') {
+            await loadAppHeaderStructure();
+        } else {
+            console.error("loadAppHeaderStructure no definida.");
+            mainAppHeaderContainer.innerHTML = "<div class='header-content'><div class='app-title'>AgroSync <i class='fas fa-leaf'></i></div><div class='app-subtitle'>Tu jardín inteligente</div></div>";
+        }
     }
-    if (!bottomNavContentLoaded && mainBottomNavContainer) {
-        mainBottomNavContainer.innerHTML = "<p style='color:var(--danger);text-align:center;'>Error nav</p>";
+
+    if (!navHasContent) {
+        console.log("Cargando navegación dinámicamente...");
+        if (typeof loadBottomNavigationStructure === 'function') {
+            await loadBottomNavigationStructure();
+        } else {
+            console.error("loadBottomNavigationStructure no definida.");
+        }
     }
     
-    // La barra de navegación siempre es visible en este modelo
-    if (mainBottomNavContainer) mainBottomNavContainer.style.display = 'flex';
+    // La barra de navegación siempre es visible
+    if (mainBottomNavContainer) {
+        mainBottomNavContainer.style.display = 'flex';
+    }
 
+    // Configurar usuario
     if (loggedInUser) {
         console.log("Usuario logueado:", loggedInUser);
-        if (typeof updateUIAfterLogin === 'function') updateUIAfterLogin(loggedInUser); // auth.js
-        if (typeof fetchAndDisplayPlants === 'function') fetchAndDisplayPlants(); // plants.js (usará el user de localStorage)
+        if (typeof updateUIAfterLogin === 'function') updateUIAfterLogin(loggedInUser);
+        if (typeof fetchAndDisplayPlants === 'function') fetchAndDisplayPlants();
     } else {
         console.log("Usuario no logueado (invitado).");
-        if (typeof updateUIForGuest === 'function') updateUIForGuest(); // auth.js
-        if (typeof fetchAndDisplayPlants === 'function') fetchAndDisplayPlants(); // plants.js (mostrará prompt de login)
+        if (typeof updateUIForGuest === 'function') updateUIForGuest();
+        if (typeof fetchAndDisplayPlants === 'function') fetchAndDisplayPlants();
     }
     
-    if (typeof showPage === 'function') { // ui.js
+    // Mostrar página inicial
+    if (typeof showPage === 'function') {
         showPage('home'); 
-    } else { console.error("showPage no definida."); }
+    } else {
+        console.error("showPage no definida.");
+        // Función básica de respaldo
+        window.showPage = function(pageId) {
+            console.log('Mostrando página:', pageId);
+            
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const activeNavItem = document.querySelector(`[onclick="showPage('${pageId}')"]`);
+            if (activeNavItem) {
+                activeNavItem.classList.add('active');
+            }
+        };
+        window.showPage('home');
+    }
     
-    if (typeof getGeoLocationAndFetchWeather === 'function') { // weather.js
+    // Cargar clima
+    if (typeof getGeoLocationAndFetchWeather === 'function') {
         getGeoLocationAndFetchWeather();
-    } else { console.error("getGeoLocationAndFetchWeather no definida."); }
+    } else {
+        console.error("getGeoLocationAndFetchWeather no definida.");
+    }
 
     // --- EVENT LISTENERS ---
     const logoutButton = document.getElementById('logout-btn');
-    if (logoutButton && typeof logoutUser === 'function') { // auth.js
+    if (logoutButton && typeof logoutUser === 'function') {
         logoutButton.addEventListener('click', logoutUser);
     }
 
     const calculateCompostBtn = document.getElementById('calculate-compost-btn');
-    if (calculateCompostBtn && typeof calculateCompost === 'function') { // compost.js
+    if (calculateCompostBtn && typeof calculateCompost === 'function') {
         calculateCompostBtn.addEventListener('click', calculateCompost);
     }
 
     const addPlantForm = document.getElementById('add-plant-form');
-    if (addPlantForm && typeof handleAddPlantFormSubmit === 'function') { // plants.js
+    if (addPlantForm && typeof handleAddPlantFormSubmit === 'function') {
         addPlantForm.addEventListener('submit', handleAddPlantFormSubmit);
     }
 
-    if (typeof initializeAssistantChat === 'function') { // assistant.js
+    // Inicializar chat del asistente
+    if (typeof initializeAssistantChat === 'function') {
         initializeAssistantChat();
     }
     
     // Inicializar el estado del asistente según el usuario
-    if (typeof updateAssistantForUser === 'function') { // assistant.js
+    if (typeof updateAssistantForUser === 'function') {
         updateAssistantForUser();
     }
     
-    if (typeof initializeDarkMode === 'function') { // ui.js
+    // Inicializar toggles y configuraciones
+    if (typeof initializeDarkMode === 'function') {
         initializeDarkMode();
     }
-    if (typeof initializeLocationToggle === 'function') { // ui.js
+    if (typeof initializeLocationToggle === 'function') {
         initializeLocationToggle();
     }
-    if (typeof initializeTouchFeedback === 'function') { // ui.js
+    if (typeof initializeTouchFeedback === 'function') {
         initializeTouchFeedback();
     }
-    if (typeof initializeGenericToggles === 'function') { // ui.js
+    if (typeof initializeGenericToggles === 'function') {
         initializeGenericToggles();
     }
+
+    console.log("AgroSync inicializado correctamente.");
 });
