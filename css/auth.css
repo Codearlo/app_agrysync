@@ -42,7 +42,8 @@
 
 .auth-card {
     width: 100%;
-    max-width: 450px;
+    max-width: 480px; /* Ancho fijo más amplio para ambas páginas */
+    min-width: 320px; /* Ancho mínimo garantizado */
     padding: 3rem 2.5rem;
     background: var(--white);
     border-radius: var(--border-radius-xl);
@@ -52,6 +53,7 @@
     position: relative;
     overflow: hidden;
     transition: var(--transition);
+    box-sizing: border-box; /* Asegurar que el padding se incluya en el ancho total */
 }
 
 .auth-card::before {
@@ -79,6 +81,10 @@
 .auth-card .page-header {
     text-align: center;
     margin-bottom: 2.5rem;
+    min-height: 120px; /* Altura mínima consistente para el header */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .auth-card .page-header h2 {
@@ -110,10 +116,12 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    width: 100%; /* Asegurar que el formulario ocupe todo el ancho disponible */
 }
 
 .auth-form .form-group {
     position: relative;
+    width: 100%; /* Cada grupo de formulario ocupa todo el ancho */
 }
 
 .auth-form .form-group label {
@@ -138,6 +146,8 @@
     color: var(--gray-800);
     font-weight: 500;
     position: relative;
+    box-sizing: border-box; /* Incluir padding y border en el ancho total */
+    min-height: 56px; /* Altura mínima consistente para todos los inputs */
 }
 
 .auth-form input[type="text"]:focus,
@@ -171,6 +181,9 @@
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
+    width: 100%; /* Botón ocupa todo el ancho disponible */
+    box-sizing: border-box;
+    min-height: 56px; /* Altura consistente para todos los botones */
 }
 
 .auth-form .action-btn::before {
@@ -218,11 +231,14 @@
     text-align: center;
     font-size: 0.9375rem;
     font-weight: 600;
-    min-height: 1.5em;
+    min-height: 3rem; /* Altura mínima consistente para mensajes */
     margin-top: 1.5rem;
     padding: 1rem;
     border-radius: var(--border-radius);
     transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .form-message.success {
@@ -275,10 +291,16 @@
 }
 
 /* Estilos para pantallas pequeñas */
-@media (max-width: 480px) {
+@media (max-width: 520px) {
+    .auth-page .main-content {
+        padding: 1rem;
+    }
+    
     .auth-card {
+        max-width: 100%; /* En móviles, usar todo el ancho disponible */
+        min-width: unset;
         padding: 2rem 1.5rem;
-        margin: 1rem;
+        margin: 0; /* Sin márgenes en móviles */
     }
     
     .auth-card .page-header h2 {
@@ -292,11 +314,20 @@
     .auth-form input[type="password"] {
         padding: 0.875rem 1rem;
         font-size: 0.9375rem;
+        min-height: 52px; /* Altura ligeramente menor en móviles */
     }
     
     .auth-form .action-btn {
         font-size: 1rem;
         padding: 1rem 1.5rem;
+        min-height: 52px; /* Altura consistente con inputs en móviles */
+    }
+}
+
+@media (min-width: 521px) {
+    .auth-card {
+        width: 480px; /* Ancho fijo en pantallas más grandes */
+        max-width: 480px;
     }
 }
 
