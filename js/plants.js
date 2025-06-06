@@ -45,41 +45,74 @@ function showLoginPrompt() {
     // Limpiar el contenedor
     plantsListContainer.innerHTML = '';
     
-    // Crear y mostrar el prompt de login
+    // Crear y mostrar el prompt de login más prominente
     const loginPrompt = document.createElement('div');
     loginPrompt.id = 'plants-login-prompt';
     loginPrompt.style.cssText = `
         text-align: center; 
-        color: var(--gray-500); 
-        padding: 2rem 1rem;
-        background: var(--gray-50);
-        border-radius: var(--border-radius-lg);
-        border: 2px dashed var(--gray-300);
+        padding: 3rem 2rem;
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
+        border-radius: var(--border-radius-xl);
         margin: 1rem 0;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-xl);
     `;
     
     loginPrompt.innerHTML = `
-        <div style="margin-bottom: 1rem;">
-            <i class="fas fa-seedling" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem; display: block;"></i>
+        <div style="position: relative; z-index: 2;">
+            <div style="margin-bottom: 1.5rem;">
+                <i class="fas fa-lock" style="font-size: 4rem; margin-bottom: 1rem; display: block; opacity: 0.9;"></i>
+            </div>
+            <h3 style="margin-bottom: 1rem; font-size: 1.5rem; font-weight: 700;">
+                🌱 ¡Únete a AgroSync!
+            </h3>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.95; line-height: 1.6;">
+                Para gestionar tus plantas necesitas una cuenta.<br>
+                <strong>Es gratis</strong> y solo toma unos segundos.
+            </p>
+            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: var(--border-radius-lg); margin-bottom: 2rem; backdrop-filter: blur(10px);">
+                <h4 style="margin-bottom: 1rem; font-size: 1.1rem;">Con tu cuenta podrás:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-seedling" style="color: #10b981; font-size: 1.2rem;"></i>
+                        <span>Añadir tus plantas</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-chart-line" style="color: #10b981; font-size: 1.2rem;"></i>
+                        <span>Monitorear su salud</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-robot" style="color: #10b981; font-size: 1.2rem;"></i>
+                        <span>Usar el asistente IA</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-bell" style="color: #10b981; font-size: 1.2rem;"></i>
+                        <span>Recibir alertas</span>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="window.location.href='register.html'" 
+                        style="background: white; color: var(--primary-blue); border: none; padding: 1rem 2rem; 
+                               border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 700;
+                               transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem;
+                               box-shadow: 0 8px 25px rgba(0,0,0,0.2); font-size: 1.1rem;">
+                    <i class="fas fa-user-plus"></i> Crear Cuenta Gratis
+                </button>
+                <button onclick="window.location.href='login.html'" 
+                        style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 1rem 2rem; 
+                               border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 600;
+                               transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem;
+                               backdrop-filter: blur(10px); font-size: 1rem;">
+                    <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
+                </button>
+            </div>
         </div>
-        <h4 style="margin-bottom: 1rem; color: var(--gray-600); font-size: 1.1rem;">¡Comienza tu jardín digital!</h4>
-        <p style="margin-bottom: 1.5rem; color: var(--gray-500);">
-            Para añadir y gestionar tus plantas necesitas una cuenta
-        </p>
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <button onclick="window.location.href='login.html'" 
-                    style="background: var(--primary-blue); color: white; border: none; padding: 0.75rem 1.5rem; 
-                           border-radius: var(--border-radius); cursor: pointer; font-weight: 600;
-                           transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-            </button>
-            <button onclick="window.location.href='register.html'" 
-                    style="background: var(--success); color: white; border: none; padding: 0.75rem 1.5rem; 
-                           border-radius: var(--border-radius); cursor: pointer; font-weight: 600;
-                           transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-user-plus"></i> Registrarse
-            </button>
-        </div>
+        <div style="position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; 
+                    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                    animation: float 8s ease-in-out infinite; z-index: 1;"></div>
     `;
     
     plantsListContainer.appendChild(loginPrompt);
