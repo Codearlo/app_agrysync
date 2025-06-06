@@ -5,22 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>AgroSync</title>
     
-    <!-- Sistema de Cache para Desarrollo -->
-    <script src="js/cache.js"></script>
-    
-    <!-- CSS Base y Variables -->
+    <!-- CSS Base y Variables (carga prioritaria) -->
     <link rel="stylesheet" href="css/base.css">
-    <!-- CSS Componentes/Secciones -->
     <link rel="stylesheet" href="css/home.css">
-    <link rel="stylesheet" href="css/diagnosis.css">
-    <link rel="stylesheet" href="css/compost.css">
-    <link rel="stylesheet" href="css/assistant.css">
-    <link rel="stylesheet" href="css/profile.css">
-    <link rel="stylesheet" href="css/auth.css"> 
+    
+    <!-- CSS secundario (carga diferida) -->
+    <link rel="preload" href="css/diagnosis.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/compost.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/assistant.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/profile.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/auth.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- CSS global (carga normal) -->
     <link rel="stylesheet" href="css/dark_mode.css">
     <link rel="stylesheet" href="css/responsive_utilities.css">
     
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Fallback para CSS diferido -->
+    <noscript>
+        <link rel="stylesheet" href="css/diagnosis.css">
+        <link rel="stylesheet" href="css/compost.css">
+        <link rel="stylesheet" href="css/assistant.css">
+        <link rel="stylesheet" href="css/profile.css">
+        <link rel="stylesheet" href="css/auth.css">
+    </noscript>
 </head>
 <body>
     <div class="app-container">
@@ -306,17 +316,41 @@
         <!-- El contenido de la navegación se cargará aquí por JavaScript -->
     </nav>
 
-    <!-- JavaScript Modularizado -->
+    <!-- JavaScript Core (carga prioritaria) -->
     <script src="js/ui.js"></script>
-    <script src="js/weather.js"></script>
-    <script src="js/camera.js"></script>
-    <script src="js/compost.js"></script>
-    <script src="js/auth.js"></script> 
-    <script src="js/assistant.js"></script>
-    <script src="js/plants.js"></script> 
+    <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
     
+    <!-- JavaScript secundario (carga diferida) -->
     <script>
+        // Cargar scripts no críticos después del DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            const scripts = [
+                'js/weather.js',
+                'js/camera.js',
+                'js/compost.js',
+                'js/assistant.js',
+                'js/plants.js'
+            ];
+            
+            scripts.forEach((src, index) => {
+                setTimeout(() => {
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.async = true;
+                    document.head.appendChild(script);
+                }, index * 100); // Espaciar la carga
+            });
+            
+            // Cargar sistema de cache al final
+            setTimeout(() => {
+                const cacheScript = document.createElement('script');
+                cacheScript.src = 'js/cache.js';
+                cacheScript.async = true;
+                document.head.appendChild(cacheScript);
+            }, 1000);
+        });
+        
         // Función para toggle de ubicación
         function toggleLocation() {
             const toggleContainer = document.getElementById('locationToggleContainer');

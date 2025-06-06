@@ -1,143 +1,148 @@
-// js/cache.js - Sistema de cache para forzar recarga de recursos
+// js/cache.js - Sistema de cache optimizado para desarrollo
 
 (function() {
     'use strict';
     
-    // Versión de cache - incrementa automáticamente cada vez que se modifica la web
-    const CACHE_VERSION = Date.now();
+    // Configuración de cache ligera
+    const CACHE_CONFIG = {
+        enabled: true,
+        version: Date.now(),
+        checkInterval: 30000, // 30 segundos en lugar de 5
+        isDev: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+        enableAutoReload: false // Deshabilitado por defecto para mejor rendimiento
+    };
     
-    // Lista de recursos que deben ser recargados
-    const RESOURCES_TO_CACHE = [
+    // Solo versionar recursos críticos
+    const CRITICAL_RESOURCES = [
         'js/main.js',
         'js/ui.js',
         'js/auth.js',
-        'js/assistant.js',
-        'js/plants.js',
-        'js/weather.js',
-        'js/compost.js',
-        'js/camera.js',
-        'css/base.css',
-        'css/home.css',
-        'css/diagnosis.css',
-        'css/compost.css',
-        'css/assistant.css',
-        'css/profile.css',
-        'css/auth.css',
-        'css/dark_mode.css',
-        'css/responsive_utilities.css'
+        'css/base.css'
     ];
     
-    function addCacheVersionToResources() {
-        // Agregar versión a CSS
-        const cssLinks = document.querySelectorAll('link[rel="stylesheet"]');
-        cssLinks.forEach(link => {
-            const href = link.getAttribute('href');
-            if (href && !href.includes('cdnjs.cloudflare.com') && !href.includes('?v=')) {
-                link.href = `${href}?v=${CACHE_VERSION}`;
-            }
-        });
+    function addVersionToCriticalResources() {
+        // Solo versionar recursos críticos para evitar recargas innecesarias
+        if (!CACHE_CONFIG.enabled) return;
         
-        // Agregar versión a JS (excepto este archivo)
-        const scripts = document.querySelectorAll('script[src]');
-        scripts.forEach(script => {
-            const src = script.getAttribute('src');
-            if (src && !src.includes('cache.js') && !src.includes('?v=')) {
-                script.src = `${src}?v=${CACHE_VERSION}`;
+        // CSS críticos únicamente
+        const criticalCSS = document.querySelectorAll('link[rel="stylesheet"]');
+        criticalCSS.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && CRITICAL_RESOURCES.some(resource => href.includes(resource.replace('js/', 'css/').replace('.js', '.css')))) {
+                if (!href.includes('?v=') && !href.includes('cdnjs.cloudflare.com')) {
+                    link.href = `${href}?v=${CACHE_CONFIG.version}`;
+                }
             }
         });
     }
     
-    function clearBrowserCache() {
-        // Limpiar localStorage de cache anterior si existe
-        const oldCacheVersion = localStorage.getItem('agrosync_cache_version');
-        if (oldCacheVersion && oldCacheVersion !== CACHE_VERSION.toString()) {
-            console.log('Nueva versión detectada, limpiando cache...');
-            
-            // Limpiar service worker cache si está disponible
+    function manageCacheVersion() {
+        const currentVersion = CACHE_CONFIG.version.toString();
+        const storedVersion = localStorage.getItem('agrosync_cache_version');
+        
+        if (storedVersion && storedVersion !== currentVersion) {
+            console.log('🔄 Nueva versión de AgroSync detectada');
+            // Solo limpiar cache del service worker si existe
             if ('caches' in window) {
-                caches.keys().then(function(names) {
-                    for (let name of names) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
                         if (name.includes('agrosync')) {
                             caches.delete(name);
                         }
-                    }
+                    });
                 });
             }
         }
         
-        // Actualizar versión en localStorage
-        localStorage.setItem('agrosync_cache_version', CACHE_VERSION.toString());
+        localStorage.setItem('agrosync_cache_version', currentVersion);
     }
     
-    function reloadPageIfNeeded() {
-        // Solo en desarrollo - forzar recarga si detecta cambios
-        const lastVersion = sessionStorage.getItem('agrosync_last_version');
-        if (lastVersion && lastVersion !== CACHE_VERSION.toString()) {
-            console.log('Cambios detectados, recargando página...');
-            window.location.reload(true);
-        }
-        sessionStorage.setItem('agrosync_last_version', CACHE_VERSION.toString());
-    }
-    
-    // Ejecutar cuando el DOM esté listo
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            addCacheVersionToResources();
-            clearBrowserCache();
-        });
-    } else {
-        addCacheVersionToResources();
-        clearBrowserCache();
-    }
-    
-    // Ejecutar inmediatamente para recursos ya cargados
-    reloadPageIfNeeded();
-    
-    // Función global para forzar recarga de un recurso específico
-    window.reloadResource = function(resourcePath) {
-        const timestamp = Date.now();
+    // Función de recarga inteligente (solo para desarrollo)
+    function setupSmartReload() {
+        if (!CACHE_CONFIG.isDev || !CACHE_CONFIG.enableAutoReload) return;
         
-        if (resourcePath.endsWith('.css')) {
-            const link = document.querySelector(`link[href*="${resourcePath}"]`);
-            if (link) {
-                const newHref = resourcePath + '?v=' + timestamp;
-                link.href = newHref;
+        let lastCheck = Date.now();
+        
+        const checkForUpdates = () => {
+            // Evitar checks muy frecuentes
+            if (Date.now() - lastCheck < CACHE_CONFIG.checkInterval) return;
+            lastCheck = Date.now();
+            
+            // Verificar solo el archivo principal
+            fetch('js/main.js', { 
+                method: 'HEAD',
+                cache: 'no-cache'
+            }).then(response => {
+                const lastModified = response.headers.get('Last-Modified');
+                const etag = response.headers.get('ETag');
+                const key = 'agrosync_main_version';
+                const stored = sessionStorage.getItem(key);
+                const current = lastModified || etag;
+                
+                if (stored && current && stored !== current && document.visibilityState === 'visible') {
+                    console.log('📱 Actualizaciones disponibles, recargando...');
+                    window.location.reload(true);
+                }
+                
+                if (current) sessionStorage.setItem(key, current);
+            }).catch(() => {
+                // Ignorar errores silenciosamente
+            });
+        };
+        
+        // Solo verificar cuando la página es visible y activa
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                setTimeout(checkForUpdates, 2000); // Delay para evitar sobrecarga
             }
-        } else if (resourcePath.endsWith('.js')) {
-            // Para JS es más complejo, mejor recargar la página
+        });
+        
+        // Check inicial diferido
+        setTimeout(checkForUpdates, 10000);
+    }
+    
+    // Función para forzar recarga manual (solo para desarrollo)
+    window.forceReload = function() {
+        if (CACHE_CONFIG.isDev) {
+            sessionStorage.clear();
+            localStorage.removeItem('agrosync_cache_version');
             window.location.reload(true);
         }
     };
     
-    // Detectar cambios de archivos en desarrollo (solo funciona si el servidor lo soporta)
-    function setupDevReload() {
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            // Verificar cambios cada 5 segundos en desarrollo
-            setInterval(function() {
-                fetch(window.location.href, { 
-                    method: 'HEAD',
-                    cache: 'no-cache'
-                }).then(response => {
-                    const lastModified = response.headers.get('Last-Modified');
-                    const storedLastModified = sessionStorage.getItem('agrosync_last_modified');
-                    
-                    if (storedLastModified && lastModified && storedLastModified !== lastModified) {
-                        console.log('Archivo modificado detectado, recargando...');
-                        window.location.reload(true);
-                    }
-                    
-                    if (lastModified) {
-                        sessionStorage.setItem('agrosync_last_modified', lastModified);
-                    }
-                }).catch(() => {
-                    // Ignorar errores de red
-                });
-            }, 5000);
+    // Función para alternar auto-recarga
+    window.toggleAutoReload = function() {
+        CACHE_CONFIG.enableAutoReload = !CACHE_CONFIG.enableAutoReload;
+        console.log(`🔄 Auto-recarga ${CACHE_CONFIG.enableAutoReload ? 'activada' : 'desactivada'}`);
+        if (CACHE_CONFIG.enableAutoReload) {
+            setupSmartReload();
+        }
+    };
+    
+    // Inicialización ligera
+    function initCache() {
+        // Solo ejecutar en carga inicial
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                addVersionToCriticalResources();
+                manageCacheVersion();
+            });
+        } else {
+            addVersionToCriticalResources();
+            manageCacheVersion();
+        }
+        
+        // Setup de desarrollo opcional
+        if (CACHE_CONFIG.isDev) {
+            setupSmartReload();
+            console.log(`🛠️ Modo desarrollo activo. Usa toggleAutoReload() para activar recarga automática.`);
         }
     }
     
-    // Inicializar detección de cambios en desarrollo
-    setupDevReload();
-    
-    console.log(`AgroSync Cache System initialized - Version: ${CACHE_VERSION}`);
+    // Evitar múltiples inicializaciones
+    if (!window.agroSyncCacheInitialized) {
+        window.agroSyncCacheInitialized = true;
+        initCache();
+        console.log(`⚡ AgroSync Cache optimizado - v${CACHE_CONFIG.version}`);
+    }
 })();
