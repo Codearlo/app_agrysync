@@ -78,8 +78,13 @@ async function handleLoginFormSubmit(event) {
 function logoutUser() {
     localStorage.removeItem('agroSyncUser');
     updateUIForGuest(); // Actualizar UI al estado de invitado
-    showPage('home'); // O redirigir a login.html si se prefiere: window.location.href = 'login.html';
-    // Si se queda en index.html, la sección de plantas mostrará el prompt de login.
+    
+    // Actualizar la sección de plantas para mostrar el prompt de login
+    if (typeof fetchAndDisplayPlants === 'function') {
+        fetchAndDisplayPlants();
+    }
+    
+    showPage('home'); // Ir a la página de inicio
 }
 
 function checkLoginStatus() {
@@ -98,10 +103,8 @@ function updateUIAfterLogin(user) {
         const profileAvatar = document.getElementById('profile-avatar-initials');
         const profileUsername = document.getElementById('profile-username');
         const profileEmail = document.getElementById('profile-email');
-        const plantsLoginPrompt = document.getElementById('plants-login-prompt');
         const profileStatsGrid = document.getElementById('profile-stats-grid');
         const profileAchievementsCard = document.getElementById('profile-achievements-card');
-
 
         if (profileAvatar) profileAvatar.textContent = user.username.substring(0, 2).toUpperCase();
         if (profileUsername) profileUsername.textContent = user.username;
@@ -109,10 +112,8 @@ function updateUIAfterLogin(user) {
 
         if (profileLoggedInContent) profileLoggedInContent.style.display = 'block';
         if (profileGuestContent) profileGuestContent.style.display = 'none';
-        if (plantsLoginPrompt) plantsLoginPrompt.style.display = 'none';
-        if (profileStatsGrid) profileStatsGrid.style.display = 'grid'; // o 'block' o el display original
+        if (profileStatsGrid) profileStatsGrid.style.display = 'grid';
         if (profileAchievementsCard) profileAchievementsCard.style.display = 'block';
-
 
         // Actualizar subtítulo del header en la página de perfil
         const profilePage = document.getElementById('profile');
@@ -120,27 +121,24 @@ function updateUIAfterLogin(user) {
             const headerSubtitleEl = document.getElementById('header-app-subtitle');
             if (headerSubtitleEl) headerSubtitleEl.textContent = `¡Bienvenido, ${user.username}!`;
         }
+        
+        // Actualizar la sección de plantas para cargar las plantas del usuario
+        if (typeof fetchAndDisplayPlants === 'function') {
+            fetchAndDisplayPlants();
+        }
     }
 }
 
 function updateUIForGuest() {
     const profileLoggedInContent = document.getElementById('profile-logged-in-content');
     const profileGuestContent = document.getElementById('profile-guest-content');
-    const plantsLoginPrompt = document.getElementById('plants-login-prompt');
-    const plantsListContainer = document.getElementById('plants-list-container');
     const profileStatsGrid = document.getElementById('profile-stats-grid');
     const profileAchievementsCard = document.getElementById('profile-achievements-card');
 
     if (profileLoggedInContent) profileLoggedInContent.style.display = 'none';
     if (profileGuestContent) profileGuestContent.style.display = 'block';
-    
-    if (plantsLoginPrompt) plantsLoginPrompt.style.display = 'block';
-    if (plantsListContainer) plantsListContainer.innerHTML = ''; // Limpiar lista de plantas
-    if (plantsListContainer) plantsListContainer.appendChild(plantsLoginPrompt); // Re-añadir el prompt
-
     if (profileStatsGrid) profileStatsGrid.style.display = 'none';
     if (profileAchievementsCard) profileAchievementsCard.style.display = 'none';
-
 
     // Actualizar subtítulo del header en la página de perfil para invitado
     const profilePage = document.getElementById('profile');
@@ -148,6 +146,7 @@ function updateUIForGuest() {
          const headerSubtitleEl = document.getElementById('header-app-subtitle');
          if (headerSubtitleEl) headerSubtitleEl.textContent = "Únete a la comunidad AgroSync";
     }
+    
     // Restablecer el subtítulo general del header si se está en otra página
     const currentPageId = document.querySelector('.page.active')?.id || 'home';
     if (typeof updateAppHeader === "function" && currentPageId !== 'profile') {

@@ -39,40 +39,136 @@ function calculateHealthPercentage(status) {
     }
 }
 
+function showLoginPrompt() {
+    if (!plantsListContainer) return;
+    
+    // Limpiar el contenedor
+    plantsListContainer.innerHTML = '';
+    
+    // Crear y mostrar el prompt de login
+    const loginPrompt = document.createElement('div');
+    loginPrompt.id = 'plants-login-prompt';
+    loginPrompt.style.cssText = `
+        text-align: center; 
+        color: var(--gray-500); 
+        padding: 2rem 1rem;
+        background: var(--gray-50);
+        border-radius: var(--border-radius-lg);
+        border: 2px dashed var(--gray-300);
+        margin: 1rem 0;
+    `;
+    
+    loginPrompt.innerHTML = `
+        <div style="margin-bottom: 1rem;">
+            <i class="fas fa-seedling" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem; display: block;"></i>
+        </div>
+        <h4 style="margin-bottom: 1rem; color: var(--gray-600); font-size: 1.1rem;">¡Comienza tu jardín digital!</h4>
+        <p style="margin-bottom: 1.5rem; color: var(--gray-500);">
+            Para añadir y gestionar tus plantas necesitas una cuenta
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <button onclick="window.location.href='login.html'" 
+                    style="background: var(--primary-blue); color: white; border: none; padding: 0.75rem 1.5rem; 
+                           border-radius: var(--border-radius); cursor: pointer; font-weight: 600;
+                           transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </button>
+            <button onclick="window.location.href='register.html'" 
+                    style="background: var(--success); color: white; border: none; padding: 0.75rem 1.5rem; 
+                           border-radius: var(--border-radius); cursor: pointer; font-weight: 600;
+                           transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-user-plus"></i> Registrarse
+            </button>
+        </div>
+    `;
+    
+    plantsListContainer.appendChild(loginPrompt);
+}
+
 async function fetchAndDisplayPlants() {
-    if (!plantsListContainer || !plantsLoginPromptEl) {
-        console.error("Elementos del DOM para la lista de plantas no encontrados.");
+    if (!plantsListContainer) {
+        console.error("Contenedor de lista de plantas no encontrado.");
         return;
     }
 
     const user = checkLoginStatus(); // checkLoginStatus() debe estar disponible globalmente desde auth.js
 
     if (!user || !user.id) {
-        plantsListContainer.innerHTML = ''; // Limpiar cualquier planta anterior
-        plantsLoginPromptEl.style.display = 'block'; // Mostrar prompt para iniciar sesión
+        console.log("Usuario no logueado, mostrando prompt de login");
+        showLoginPrompt();
         return;
     }
 
-    plantsLoginPromptEl.style.display = 'none'; // Ocultar prompt si está logueado
     console.log(`Fetching plants for user ID: ${user.id}`);
+
+    // Mostrar loading mientras se cargan las plantas
+    plantsListContainer.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+            Cargando tus plantas...
+        </div>
+    `;
 
     try {
         const response = await fetch(`backend/get_plants.php?user_id=${user.id}`); 
         if (!response.ok) {
             let errorDetails = `HTTP error! status: ${response.status}`;
-            try { const errorData = await response.json(); if (errorData && errorData.error) { errorDetails += ` - ${errorData.error}`; } } catch (e) {}
+            try { 
+                const errorData = await response.json(); 
+                if (errorData && errorData.error) { 
+                    errorDetails += ` - ${errorData.error}`; 
+                } 
+            } catch (e) {}
             throw new Error(errorDetails);
         }
         const plants = await response.json();
-        plantsListContainer.innerHTML = ''; 
+        plantsListContainer.innerHTML = ''; // Limpiar loading
+        
         if (plants.length === 0) {
-            plantsListContainer.innerHTML = '<p style="text-align: center; color: var(--gray-500);">Aún no has añadido ninguna planta. ¡Ve a tu perfil para empezar!</p>';
+            // Mostrar mensaje cuando no hay plantas pero está logueado
+            const noPlants = document.createElement('div');
+            noPlants.style.cssText = `
+                text-align: center; 
+                color: var(--gray-500); 
+                padding: 2rem 1rem;
+                background: var(--gray-50);
+                border-radius: var(--border-radius-lg);
+                border: 2px dashed var(--gray-300);
+                margin: 1rem 0;
+            `;
+            noPlants.innerHTML = `
+                <div style="margin-bottom: 1rem;">
+                    <i class="fas fa-seedling" style="font-size: 3rem; color: var(--primary-green); margin-bottom: 1rem; display: block;"></i>
+                </div>
+                <h4 style="margin-bottom: 1rem; color: var(--gray-600); font-size: 1.1rem;">¡Aún no tienes plantas!</h4>
+                <p style="margin-bottom: 1.5rem; color: var(--gray-500);">
+                    Ve a tu perfil para añadir tu primera planta y comenzar a cuidar tu jardín digital
+                </p>
+                <button onclick="showPage('profile')" 
+                        style="background: var(--primary-green); color: white; border: none; padding: 0.75rem 1.5rem; 
+                               border-radius: var(--border-radius); cursor: pointer; font-weight: 600;
+                               transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-plus-circle"></i> Añadir Primera Planta
+                </button>
+            `;
+            plantsListContainer.appendChild(noPlants);
         } else {
             plants.forEach(plant => renderPlant(plant));
         }
     } catch (error) {
         console.error("Error al obtener las plantas:", error);
-        plantsListContainer.innerHTML = `<p style="color: var(--danger); text-align: center;">Error al cargar las plantas: ${error.message}. Intenta de nuevo más tarde.</p>`;
+        plantsListContainer.innerHTML = `
+            <div style="color: var(--danger); text-align: center; padding: 2rem; background: var(--gray-50); border-radius: var(--border-radius-lg); border: 2px solid var(--danger);">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                <h4 style="margin-bottom: 1rem;">Error al cargar las plantas</h4>
+                <p style="margin-bottom: 1rem;">${error.message}</p>
+                <button onclick="fetchAndDisplayPlants()" 
+                        style="background: var(--danger); color: white; border: none; padding: 0.75rem 1.5rem; 
+                               border-radius: var(--border-radius); cursor: pointer; font-weight: 600;">
+                    <i class="fas fa-redo"></i> Reintentar
+                </button>
+            </div>
+        `;
     }
 }
 
@@ -89,17 +185,9 @@ async function handleAddPlantFormSubmit(event) {
     if (!user || !user.id) {
         addPlantMessage.textContent = 'Debes iniciar sesión para añadir plantas.';
         addPlantMessage.style.color = 'var(--danger)';
-        // Opcional: Redirigir a la página de login o mostrar un modal de login
         setTimeout(() => {
-            if (typeof showPage === 'function') {
-                // No tenemos una página de login separada en index.html,
-                // el usuario debe ir a login.html.
-                // Podríamos mostrar un mensaje más prominente o un botón para ir a login.
-                alert("Por favor, inicia sesión para añadir plantas.");
-                window.location.href = 'login.html';
-            } else {
-                 alert("Por favor, inicia sesión para añadir plantas.");
-            }
+            alert("Por favor, inicia sesión para añadir plantas.");
+            window.location.href = 'login.html';
         }, 1500);
         return;
     }
@@ -144,19 +232,14 @@ async function handleAddPlantFormSubmit(event) {
             addPlantMessage.textContent = result.message;
             addPlantMessage.style.color = 'var(--success)';
             form.reset(); 
-            if (plantsListContainer) { 
-                 if (plantsLoginPromptEl && plantsLoginPromptEl.style.display === 'block') {
-                    plantsLoginPromptEl.style.display = 'none';
-                    plantsListContainer.innerHTML = ''; 
-                }
-                const newPlantData = {
-                    id: result.plant_id, 
-                    plant_name: result.plant_name,
-                    plant_description: result.plant_description,
-                    health_status: result.health_status,
-                };
-                renderPlant(newPlantData); 
-            }
+            
+            // Actualizar la lista de plantas en la página home
+            fetchAndDisplayPlants();
+            
+            // Opcional: cambiar a la página home para ver la nueva planta
+            setTimeout(() => {
+                showPage('home');
+            }, 1500);
         } else {
             addPlantMessage.textContent = result.message || 'Error al guardar la planta.';
             addPlantMessage.style.color = 'var(--danger)';
