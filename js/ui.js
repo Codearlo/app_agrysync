@@ -290,6 +290,11 @@ function showPage(pageId) {
         const badge = document.getElementById('header-notification-badge');
         const count = badge ? parseInt(badge.textContent) : 0;
         updateAppHeader(pageId, isNaN(count) ? 0 : count);
+        
+        // Actualizar el asistente cuando se navega a la página del asistente
+        if (pageId === 'assistant' && typeof updateAssistantForUser === 'function') {
+            updateAssistantForUser();
+        }
     } else {
         console.warn(`UI WARNING: Página con ID '${pageId}' no encontrada.`);
     }

@@ -84,6 +84,11 @@ function logoutUser() {
         fetchAndDisplayPlants();
     }
     
+    // Actualizar el asistente para mostrar el prompt de login
+    if (typeof updateAssistantForUser === 'function') {
+        updateAssistantForUser();
+    }
+    
     showPage('home'); // Ir a la página de inicio
 }
 
@@ -125,6 +130,11 @@ function updateUIAfterLogin(user) {
         // Actualizar la sección de plantas para cargar las plantas del usuario
         if (typeof fetchAndDisplayPlants === 'function') {
             fetchAndDisplayPlants();
+        }
+        
+        // Actualizar el asistente para el usuario logueado
+        if (typeof updateAssistantForUser === 'function') {
+            updateAssistantForUser();
         }
     }
 }

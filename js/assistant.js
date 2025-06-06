@@ -20,6 +20,42 @@ function addMessageToChat(text, sender) {
     chatMessagesContainerAssistant.scrollTop = chatMessagesContainerAssistant.scrollHeight;
 }
 
+function showLoginRequiredMessage() {
+    if (!chatMessagesContainerAssistant) {
+        chatMessagesContainerAssistant = document.querySelector('#assistant .chat-messages');
+        if (!chatMessagesContainerAssistant) {
+            console.error("Contenedor de mensajes del chat no encontrado.");
+            return;
+        }
+    }
+    
+    // Limpiar mensajes existentes
+    chatMessagesContainerAssistant.innerHTML = '';
+    
+    // Crear mensaje de login requerido
+    const loginMessage = document.createElement('div');
+    loginMessage.classList.add('message', 'bot');
+    loginMessage.innerHTML = `
+        Para acceder al asistente AgriBot necesitas iniciar sesión. 
+        <br><br>
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+            <button onclick="window.location.href='login.html'" 
+                    style="background: var(--primary-blue); color: white; border: none; padding: 0.75rem 1.5rem; 
+                           border-radius: var(--border-radius); cursor: pointer; font-weight: 600;
+                           transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </button>
+            <button onclick="window.location.href='register.html'" 
+                    style="background: var(--success); color: white; border: none; padding: 0.75rem 1.5rem; 
+                           border-radius: var(--border-radius); cursor: pointer; font-weight: 600;
+                           transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-user-plus"></i> Registrarse
+            </button>
+        </div>
+    `;
+    chatMessagesContainerAssistant.appendChild(loginMessage);
+}
+
 async function getGeminiResponse(userPrompt) {
     addMessageToChat("AgriBot está pensando... 🤔", 'bot-loading'); 
     const apiKey = "AIzaSyCObTKToTanRgfD4TaQLLRWKMRmPjH7ubM"; 
@@ -94,6 +130,13 @@ function initializeAssistantChat() {
 
     if (sendMessageBtnAssistant && userInputAssistant && chatMessagesContainerAssistant) {
         sendMessageBtnAssistant.addEventListener('click', () => {
+            // Verificar si el usuario está logueado
+            const user = checkLoginStatus();
+            if (!user) {
+                showLoginRequiredMessage();
+                return;
+            }
+
             const messageText = userInputAssistant.value.trim();
             if (messageText) {
                 addMessageToChat(messageText, 'user');
@@ -111,5 +154,29 @@ function initializeAssistantChat() {
         console.log("Chat del asistente inicializado.");
     } else {
         console.warn("No se pudieron encontrar todos los elementos para inicializar el chat del asistente.");
+    }
+}
+
+/**
+ * Función para actualizar el chat cuando el usuario inicia o cierra sesión
+ */
+function updateAssistantForUser() {
+    const user = checkLoginStatus();
+    if (!chatMessagesContainerAssistant) {
+        chatMessagesContainerAssistant = document.querySelector('#assistant .chat-messages');
+    }
+    
+    if (!chatMessagesContainerAssistant) return;
+    
+    if (user) {
+        // Usuario logueado - mostrar mensaje de bienvenida
+        chatMessagesContainerAssistant.innerHTML = '';
+        const welcomeMessage = document.createElement('div');
+        welcomeMessage.classList.add('message', 'bot');
+        welcomeMessage.textContent = `¡Hola ${user.username}! 🌱 Soy AgriBot, tu asistente personal de jardinería en AgroSync. ¿En qué puedo ayudarte con tu jardín hoy? 🌿`;
+        chatMessagesContainerAssistant.appendChild(welcomeMessage);
+    } else {
+        // Usuario no logueado - mostrar mensaje de login requerido
+        showLoginRequiredMessage();
     }
 }

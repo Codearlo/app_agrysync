@@ -72,6 +72,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         initializeAssistantChat();
     }
     
+    // Inicializar el estado del asistente según el usuario
+    if (typeof updateAssistantForUser === 'function') { // assistant.js
+        updateAssistantForUser();
+    }
+    
     if (typeof initializeDarkMode === 'function') { // ui.js
         initializeDarkMode();
     }
