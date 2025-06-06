@@ -18,7 +18,7 @@
     window.agroSyncCacheLoaded = true;
     
     // Configuración simple
-    const CACHE_VERSION = '1.0.1';
+    const CACHE_VERSION = '12.0.0';
     
     function initSimpleCache() {
         try {
