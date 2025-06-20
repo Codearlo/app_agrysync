@@ -378,7 +378,12 @@
       .then(response => response.json())
       .then(data => {
         if (data.logueado) {
-          document.getElementById('seccion-unete-agrosync').style.display = 'none';
+          document.getElementById('nombre-usuario').textContent = data.nombre;
+          document.getElementById('botones-sesion').style.display = 'none';
+          document.getElementById('botones-usuario').style.display = 'block';
+        } else {
+          document.getElementById('botones-sesion').style.display = 'block';
+          document.getElementById('botones-usuario').style.display = 'none';
         }
       })
       .catch(error => console.error('Error al verificar la sesión:', error));
@@ -386,3 +391,15 @@
 
   document.addEventListener('DOMContentLoaded', verificarSesion);
 </script>
+
+<div id="perfil">
+  <h2>Perfil de <span id="nombre-usuario"></span></h2>
+  <div id="botones-sesion">
+    <button onclick="window.location.href='login.html'">Iniciar Sesión</button>
+    <button onclick="window.location.href='register.html'">Registrarse</button>
+  </div>
+  <div id="botones-usuario" style="display: none;">
+    <button onclick="window.location.href='mis_plantas.html'">Mis Plantas</button>
+    <button onclick="window.location.href='asistente.html'">Asistente</button>
+  </div>
+</div>
