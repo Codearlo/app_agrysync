@@ -207,17 +207,7 @@
                 <section class="card">
                     <div id="plants-list-container" class="plants-list">
                         <!-- Prompt de registro mejorado -->
-                        <div style="
-                            text-align: center; 
-                            padding: 3rem 2rem;
-                            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
-                            border-radius: var(--border-radius-xl);
-                            margin: 1rem 0;
-                            color: white;
-                            position: relative;
-                            overflow: hidden;
-                            box-shadow: var(--shadow-xl);
-                        ">
+                        <div id="seccion-unete-agrosync" style="text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%); border-radius: var(--border-radius-xl); margin: 1rem 0; color: white; position: relative; overflow: hidden; box-shadow: var(--shadow-xl);">
                             <div style="position: relative; z-index: 2;">
                                 <div style="margin-bottom: 1.5rem;">
                                     <i class="fas fa-lock" style="font-size: 4rem; margin-bottom: 1rem; display: block; opacity: 0.9;"></i>
@@ -381,3 +371,18 @@
     <script src="js/camera.js"></script>
 </body>
 </html>
+
+<script>
+  function verificarSesion() {
+    fetch('backend/verificar_sesion.php')
+      .then(response => response.json())
+      .then(data => {
+        if (data.logueado) {
+          document.getElementById('seccion-unete-agrosync').style.display = 'none';
+        }
+      })
+      .catch(error => console.error('Error al verificar la sesión:', error));
+  }
+
+  document.addEventListener('DOMContentLoaded', verificarSesion);
+</script>
