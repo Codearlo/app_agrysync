@@ -1,32 +1,31 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <!-- Mismo head que home.html -->
+    <!-- Head común -->
     <link rel="stylesheet" href="css/diagnosis.css">
 </head>
 <body>
-    <!-- Header -->
-    <div class="app-container">
-        <div id="diagnosis" class="page active">
-            <!-- Contenido completo de la sección diagnóstico -->
-            <main class="main-content">
-                <div class="page-header">
-                    <h2><i class="fas fa-stethoscope"></i> Diagnóstico de Plantas</h2>
-                    <p>Usa la cámara para identificar enfermedades o deficiencias.</p>
-                </div>
-                <!-- ... resto del contenido de diagnóstico ... -->
-            </main>
-        </div>
+    <!--#include virtual="includes/app_header.html" -->
+    
+    <div class="page-content" id="diagnostico">
+        <!-- Contenido completo de Diagnosis -->
+        <main class="main-content">
+            <div class="page-header">
+                <h2><i class="fas fa-stethoscope"></i> Diagnóstico de Plantas</h2>
+                <p>Usa la cámara para identificar enfermedades o deficiencias.</p>
+            </div>
+            <section class="camera-section card">
+                <video id="camera-preview" autoplay playsinline></video>
+                <button class="camera-btn" id="take-photo-btn">
+                    <i class="fas fa-camera"></i> Tomar Foto
+                </button>
+            </section>
+        </main>
     </div>
 
-    <!-- Navegación actualizada -->
-    <nav class="bottom-nav">
-        <button onclick="window.location.href='home.html'">Inicio</button>
-        <button class="active" onclick="window.location.href='diagnosis.html'">Diagnóstico</button>
-        <!-- ... otros botones ... -->
-    </nav>
-
-    <!-- Scripts necesarios -->
+    <!--#include virtual="includes/bottom_navigation.html" -->
+    
+    <script src="js/main.js"></script>
     <script src="js/camera.js"></script>
 </body>
 </html>
