@@ -3,70 +3,59 @@
 let chatMessagesContainerAssistant; 
 let userInputAssistant;
 let sendMessageBtnAssistant;
-let chatHistory = [];
+let assistantContentWrapper;
 
-async function analyzePlantHealth(image) {
-    const apiKey = "AIzaSyCObTKToTanRgfD4TaQLLRWKMRmPjH7ubM";
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-    const systemPromptText = `Eres un experto en el diagnóstico de enfermedades de plantas. Analiza la imagen proporcionada y determina las posibles enfermedades que pueda tener la planta, así como un porcentaje estimado de salud.`;
+function setupAssistantUI() {
+    assistantContentWrapper = document.getElementById('assistant-content-wrapper');
+    if (!assistantContentWrapper) return;
 
-    const base64Image = image.split(',')[1];
-    const imagePart = {
-        inlineData: {
-            data: base64Image,
-            mimeType: "image/jpeg"
-        }
-    };
+    assistantContentWrapper.innerHTML = `
+        <div class="chat-interface">
+            <div class="chat-messages"></div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Escribe tu pregunta aquí..." autocomplete="off">
+            <button id="sendMessageBtn">
+                <i class="fas fa-paper-plane"></i> Enviar
+            </button>
+        </div>
+    `;
+    chatMessagesContainerAssistant = assistantContentWrapper.querySelector('.chat-messages');
+    userInputAssistant = assistantContentWrapper.querySelector('#userInput');
+    sendMessageBtnAssistant = assistantContentWrapper.querySelector('#sendMessageBtn');
+    
+    initializeAssistantEventListeners();
+}
 
-    const prompt = "Analiza esta imagen para detectar posibles enfermedades de la planta y su porcentaje de salud.";
-
-    const payload = {
-        contents: [{
-            role: "user",
-            parts: [
-                { text: prompt },
-                imagePart
-            ]
-        }],
-        systemInstruction: { parts: [{ text: systemPromptText }] },
-    };
-
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: { message: "No se pudo obtener detalle del error." } }));
-            console.error("Error de API Gemini:", response.status, errorData);
-            let errorMessage = `Lo siento, no pude procesar tu solicitud en este momento (Error: ${response.status}) 😔.`;
-            if (chatMessagesContainerAssistant) addMessageToChat(errorMessage, 'bot-error');
-            return;
-        }
-
-        const result = await response.json();
-        if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
-            if (chatMessagesContainerAssistant) addMessageToChat(result.candidates[0].content.parts[0].text, 'bot');
-        } else {
-            console.error("Respuesta inesperada de la API de Gemini:", result);
-            if (chatMessagesContainerAssistant) addMessageToChat("Recibí una respuesta inesperada 😕. Por favor, intenta reformular tu pregunta o inténtalo más tarde.", 'bot-error');
-        }
-    } catch (error) {
-        console.error("Error al llamar a la API de Gemini:", error);
-        if (chatMessagesContainerAssistant) addMessageToChat("Hubo un problema de conexión al intentar obtener una respuesta 🌐🔌. Verifica tu conexión a internet e inténtalo de nuevo.", 'bot-error');
-    }
+function showLoginRequiredMessage() {
+    assistantContentWrapper = document.getElementById('assistant-content-wrapper');
+    if (!assistantContentWrapper) return;
+    
+    assistantContentWrapper.innerHTML = `
+        <div id="seccion-unete-agrosync" style="text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%); border-radius: var(--border-radius-xl); margin: 1rem 0; color: white; position: relative; overflow: hidden; box-shadow: var(--shadow-xl);">
+            <div style="position: relative; z-index: 2;">
+                <i class="fas fa-lock" style="font-size: 4rem; margin-bottom: 1rem; display: block; opacity: 0.9;"></i>
+                <h3 style="margin-bottom: 1rem; font-size: 1.5rem; font-weight: 700;">🌱 ¡Únete a AgroSync!</h3>
+                <p style="margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.95; line-height: 1.6;">
+                    Para chatear con AgriBot necesitas una cuenta.<br>
+                    <strong>Es gratis</strong> y solo toma unos segundos.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="window.location.href='register.html'" style="background: white; color: var(--primary-blue); border: none; padding: 1rem 2rem; border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 700; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 25px rgba(0,0,0,0.2); font-size: 1.1rem;">
+                        <i class="fas fa-user-plus"></i> Crear Cuenta Gratis
+                    </button>
+                    <button onclick="window.location.href='login.html'" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 1rem 2rem; border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 600; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem; backdrop-filter: blur(10px); font-size: 1rem;">
+                        <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function addMessageToChat(text, sender) {
-    if (!chatMessagesContainerAssistant) {
-        chatMessagesContainerAssistant = document.querySelector('#assistant .chat-messages');
-        if (!chatMessagesContainerAssistant) {
-            console.error("Contenedor de mensajes del chat no encontrado en addMessageToChat.");
-            return;
-        }
-    }
+    if (!chatMessagesContainerAssistant) return;
+
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', sender);
     messageDiv.textContent = text;
@@ -74,73 +63,14 @@ function addMessageToChat(text, sender) {
     chatMessagesContainerAssistant.scrollTop = chatMessagesContainerAssistant.scrollHeight;
 }
 
-function showLoginRequiredMessage() {
-    if (!chatMessagesContainerAssistant) {
-        chatMessagesContainerAssistant = document.querySelector('#assistant .chat-messages');
-        if (!chatMessagesContainerAssistant) {
-            console.error("Contenedor de mensajes del chat no encontrado.");
-            return;
-        }
-    }
-    
-    // Limpiar mensajes existentes
-    chatMessagesContainerAssistant.innerHTML = '';
-    
-    // Crear mensaje de login requerido
-    const loginMessage = document.createElement('div');
-    loginMessage.classList.add('message', 'bot');
-    loginMessage.innerHTML = `
-        🔒 Para acceder al asistente AgriBot necesitas una cuenta en AgroSync.
-        <br><br>
-        Con una cuenta podrás:
-        <br>• Hacer preguntas sobre jardinería 🌱
-        <br>• Obtener consejos personalizados 💡
-        <br>• Guardar conversaciones 💾
-        <br>• Gestionar tus plantas 🪴
-        <br><br>
-        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;">
-            <button onclick="window.location.href='login.html'" 
-                    style="background: var(--primary-blue); color: white; border: none; padding: 0.75rem 1.5rem; 
-                           border-radius: var(--border-radius); cursor: pointer; font-weight: 600;
-                           transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem;
-                           box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
-                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-            </button>
-            <button onclick="window.location.href='register.html'" 
-                    style="background: var(--success); color: white; border: none; padding: 0.75rem 1.5rem; 
-                           border-radius: var(--border-radius); cursor: pointer; font-weight: 600;
-                           transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem;
-                           box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
-                <i class="fas fa-user-plus"></i> Crear Cuenta
-            </button>
-        </div>
-    `;
-    chatMessagesContainerAssistant.appendChild(loginMessage);
-    
-    // Deshabilitar el input y botón
-    if (userInputAssistant) {
-        userInputAssistant.disabled = true;
-        userInputAssistant.placeholder = "Inicia sesión para chatear con AgriBot...";
-    }
-    if (sendMessageBtnAssistant) {
-        sendMessageBtnAssistant.disabled = true;
-        sendMessageBtnAssistant.style.opacity = "0.5";
-    }
-}
-
 async function getGeminiResponse(userPrompt) {
     addMessageToChat("AgriBot está pensando... 🤔", 'bot-loading'); 
     const apiKey = "AIzaSyCObTKToTanRgfD4TaQLLRWKMRmPjH7ubM"; 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-    const systemPromptText = `Eres AgriBot, un asistente virtual experto en jardinería y agricultura para la aplicación AgroSync. 
-        Tu propósito es ayudar a los usuarios con sus preguntas sobre el cultivo de plantas, compostaje, diagnóstico de enfermedades de plantas y el uso general de la aplicación AgroSync.
-        Siempre que sea apropiado, incluye emojis relevantes en tus respuestas para hacer la conversación más amigable y visual. 🌱💧☀️🐛
-        Si te preguntan sobre temas no relacionados con jardinería, agricultura o la aplicación AgroSync, responde amablemente que no tienes información sobre ese tema (quizás con un emoji como 🤷‍♂️ o 🚫), pero que estarás encantado de ayudar con cualquier consulta sobre plantas o la app.
-        Puedes responder preguntas sobre cómo usar la calculadora de compostaje, la función de diagnóstico, el perfil de usuario, etc., dentro de AgroSync.
-        Mantén tus respuestas concisas, amigables y útiles.`;
-    const currentConversationForAPI = [{ role: "user", parts: [{ text: userPrompt }] }];
+    const systemPromptText = `Eres AgriBot, un asistente virtual experto en jardinería y agricultura para la aplicación AgroSync. Responde en español.`;
+
     const payload = {
-        contents: currentConversationForAPI, 
+        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
         systemInstruction: { parts: [{ text: systemPromptText }] },
     };
 
@@ -154,61 +84,27 @@ async function getGeminiResponse(userPrompt) {
         if (loadingMessage) loadingMessage.remove();
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: { message: "No se pudo obtener detalle del error."} })); 
-            console.error("Error de API Gemini:", response.status, errorData);
-            let errorMessage = `Lo siento, no pude procesar tu solicitud en este momento (Error: ${response.status}) 😔.`;
-            if (errorData?.error?.message) {
-                if (errorData.error.message.includes("API key not valid")) {
-                    errorMessage = "Lo siento, parece que hay un problema con la configuración de la API 🔑. Por favor, contacta al administrador.";
-                } else if (response.status === 400) {
-                     errorMessage = "Parece que hubo un problema con la solicitud (Error 400) 🤔. Intenta reformular tu pregunta.";
-                }
-            }
-            addMessageToChat(errorMessage, 'bot-error');
+            addMessageToChat(`Error de API: ${response.status}`, 'bot-error');
             return;
         }
         const result = await response.json();
         if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
             addMessageToChat(result.candidates[0].content.parts[0].text, 'bot');
-        } else if (result.promptFeedback?.blockReason) {
-            console.warn("Respuesta bloqueada por la API de Gemini:", result.promptFeedback.blockReason);
-            let blockedMessage = "Lo siento, no puedo responder a esa pregunta porque el contenido ha sido bloqueado 🚫.";
-            if(result.promptFeedback.blockReason === "SAFETY") {
-                blockedMessage = "Lo siento, tu pregunta ha activado nuestros filtros de seguridad y no puedo procesarla 🛡️.";
-            }
-            addMessageToChat(blockedMessage, 'bot-error');
         } else {
-            console.error("Respuesta inesperada de la API de Gemini:", result);
-            addMessageToChat("Recibí una respuesta inesperada 😕. Por favor, intenta reformular tu pregunta o inténtalo más tarde.", 'bot-error');
+            addMessageToChat("No se pudo obtener una respuesta.", 'bot-error');
         }
     } catch (error) {
-        console.error("Error al llamar a la API de Gemini:", error);
-        const loadingMessage = chatMessagesContainerAssistant?.querySelector('.bot-loading');
-        if (loadingMessage) loadingMessage.remove();
-        addMessageToChat("Hubo un problema de conexión al intentar obtener una respuesta 🌐🔌. Verifica tu conexión a internet e inténtalo de nuevo.", 'bot-error');
+        if (chatMessagesContainerAssistant?.querySelector('.bot-loading')) {
+             chatMessagesContainerAssistant.querySelector('.bot-loading').remove();
+        }
+        addMessageToChat("Error de conexión.", 'bot-error');
     }
 }
 
-/**
- * Inicializa los event listeners para la interfaz de chat del asistente.
- */
-function initializeAssistantChat() {
-    const assistantPage = document.getElementById('assistant');
-    if (!assistantPage) return; // No hacer nada si la página del asistente no está
 
-    chatMessagesContainerAssistant = assistantPage.querySelector('.chat-messages');
-    userInputAssistant = assistantPage.querySelector('#userInput'); 
-    sendMessageBtnAssistant = assistantPage.querySelector('#sendMessageBtn');  
-
-    if (sendMessageBtnAssistant && userInputAssistant && chatMessagesContainerAssistant) {
+function initializeAssistantEventListeners() {
+    if (sendMessageBtnAssistant && userInputAssistant) {
         sendMessageBtnAssistant.addEventListener('click', () => {
-            // Verificar si el usuario está logueado
-            const user = checkLoginStatus();
-            if (!user) {
-                showLoginRequiredMessage();
-                return;
-            }
-
             const messageText = userInputAssistant.value.trim();
             if (messageText) {
                 addMessageToChat(messageText, 'user');
@@ -221,60 +117,19 @@ function initializeAssistantChat() {
         userInputAssistant.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                const user = checkLoginStatus();
-                if (!user) {
-                    showLoginRequiredMessage();
-                    return;
-                }
-                if(sendMessageBtnAssistant) sendMessageBtnAssistant.click();
+                sendMessageBtnAssistant.click();
             }
         });
-
-        // Verificar cuando el usuario trata de escribir sin estar logueado
-        userInputAssistant.addEventListener('focus', () => {
-            const user = checkLoginStatus();
-            if (!user) {
-                showLoginRequiredMessage();
-                userInputAssistant.blur();
-            }
-        });
-
-        console.log("Chat del asistente inicializado.");
-    } else {
-        console.warn("No se pudieron encontrar todos los elementos para inicializar el chat del asistente.");
     }
 }
 
-/**
- * Función para actualizar el chat cuando el usuario inicia o cierra sesión
- */
-function updateAssistantForUser() {
-    const user = checkLoginStatus();
-    if (!chatMessagesContainerAssistant) {
-        chatMessagesContainerAssistant = document.querySelector('#assistant .chat-messages');
-    }
-    
-    if (!chatMessagesContainerAssistant) return;
+async function updateAssistantForUser() {
+    const user = await checkLoginStatus();
     
     if (user) {
-        // Usuario logueado - mostrar mensaje de bienvenida y habilitar interfaz
-        chatMessagesContainerAssistant.innerHTML = '';
-        const welcomeMessage = document.createElement('div');
-        welcomeMessage.classList.add('message', 'bot');
-        welcomeMessage.textContent = `¡Hola ${user.username}! 🌱 Soy AgriBot, tu asistente personal de jardinería en AgroSync. ¿En qué puedo ayudarte con tu jardín hoy? 🌿`;
-        chatMessagesContainerAssistant.appendChild(welcomeMessage);
-        
-        // Habilitar input y botón
-        if (userInputAssistant) {
-            userInputAssistant.disabled = false;
-            userInputAssistant.placeholder = "Escribe tu pregunta aquí...";
-        }
-        if (sendMessageBtnAssistant) {
-            sendMessageBtnAssistant.disabled = false;
-            sendMessageBtnAssistant.style.opacity = "1";
-        }
+        setupAssistantUI();
+        addMessageToChat(`¡Hola ${user.username}! 🌱 Soy AgriBot, ¿en qué puedo ayudarte hoy?`, 'bot');
     } else {
-        // Usuario no logueado - mostrar mensaje de login requerido
         showLoginRequiredMessage();
     }
 }

@@ -62,7 +62,6 @@ async function handleLoginFormSubmit(event) {
         });
         const result = await response.json();
         if (result.success) {
-            // Ya no guardamos en localStorage. La sesión se maneja por cookies.
             window.location.href = 'index.html'; 
         } else {
             messageElement.textContent = result.message || 'Error en el inicio de sesión.';
@@ -81,7 +80,6 @@ async function logoutUser() {
     } catch (error) {
         console.error("Error al cerrar sesión en el backend:", error);
     } finally {
-        // Redirigir a la página de inicio de sesión o a la home
         window.location.href = 'login.html';
     }
 }
@@ -89,7 +87,6 @@ async function logoutUser() {
 async function checkLoginStatus() {
     try {
         const response = await fetch(`${BASE_URL_BACKEND_AUTH}verificar_sesion.php`, {
-            // Evitar que la respuesta sea cacheada por el navegador
             cache: 'no-cache'
         });
         if (!response.ok) return null;
@@ -103,13 +100,12 @@ async function checkLoginStatus() {
 
 function updateUIAfterLogin(user) {
     if (user) {
+        // --- Perfil ---
         const profileLoggedInContent = document.getElementById('profile-logged-in-content');
         const profileGuestContent = document.getElementById('profile-guest-content');
         const profileAvatar = document.getElementById('profile-avatar-initials');
         const profileUsername = document.getElementById('profile-username');
         const profileEmail = document.getElementById('profile-email');
-        const profileStatsGrid = document.getElementById('profile-stats-grid');
-        const profileAchievementsCard = document.getElementById('profile-achievements-card');
 
         if (profileAvatar) profileAvatar.textContent = user.username.substring(0, 2).toUpperCase();
         if (profileUsername) profileUsername.textContent = user.username;
@@ -117,15 +113,8 @@ function updateUIAfterLogin(user) {
 
         if (profileLoggedInContent) profileLoggedInContent.style.display = 'block';
         if (profileGuestContent) profileGuestContent.style.display = 'none';
-        if (profileStatsGrid) profileStatsGrid.style.display = 'grid';
-        if (profileAchievementsCard) profileAchievementsCard.style.display = 'block';
 
-        const profilePage = document.getElementById('profile');
-        if (profilePage && profilePage.classList.contains('active')) {
-            const headerSubtitleEl = document.getElementById('header-app-subtitle');
-            if (headerSubtitleEl) headerSubtitleEl.textContent = `¡Bienvenido, ${user.username}!`;
-        }
-        
+        // --- Actualizar Plantas y Asistente ---
         if (typeof fetchAndDisplayPlants === 'function') {
             fetchAndDisplayPlants();
         }
@@ -137,24 +126,18 @@ function updateUIAfterLogin(user) {
 }
 
 function updateUIForGuest() {
+    // --- Perfil ---
     const profileLoggedInContent = document.getElementById('profile-logged-in-content');
     const profileGuestContent = document.getElementById('profile-guest-content');
-    const profileStatsGrid = document.getElementById('profile-stats-grid');
-    const profileAchievementsCard = document.getElementById('profile-achievements-card');
-
+    
     if (profileLoggedInContent) profileLoggedInContent.style.display = 'none';
     if (profileGuestContent) profileGuestContent.style.display = 'block';
-    if (profileStatsGrid) profileStatsGrid.style.display = 'none';
-    if (profileAchievementsCard) profileAchievementsCard.style.display = 'none';
 
-    const profilePage = document.getElementById('profile');
-    if (profilePage && profilePage.classList.contains('active')) {
-         const headerSubtitleEl = document.getElementById('header-app-subtitle');
-         if (headerSubtitleEl) headerSubtitleEl.textContent = "Únete a la comunidad AgroSync";
+    // --- Actualizar Plantas y Asistente para invitado ---
+    if (typeof fetchAndDisplayPlants === 'function') {
+        fetchAndDisplayPlants(); // Mostrará el prompt de login
     }
-    
-    const currentPageId = document.querySelector('.page.active')?.id || 'home';
-    if (typeof updateAppHeader === "function" && currentPageId !== 'profile') {
-        updateAppHeader(currentPageId);
+    if (typeof updateAssistantForUser === 'function') {
+        updateAssistantForUser(); // Mostrará el mensaje de login requerido
     }
 }

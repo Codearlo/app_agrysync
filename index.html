@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>AgroSync</title>
     
-    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
     
-    <!-- CSS -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/home.css">
     <link rel="stylesheet" href="css/diagnosis.css">
@@ -20,12 +18,10 @@
     <link rel="stylesheet" href="css/responsive_utilities.css">
     <link rel="stylesheet" href="css/navigation.css">
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
-        <!-- Header dinámico -->
         <header class="app-header" id="main-app-header">
             <div class="header-content">
                 <div class="app-title">AgroSync <i class="fas fa-leaf"></i></div>
@@ -33,7 +29,6 @@
             </div>
         </header>
 
-        <!-- Page: Home -->
         <div id="home" class="page active"> 
             <main class="main-content">
                 <section class="weather-card card">
@@ -78,75 +73,7 @@
                         <h3 class="section-title">Mis Plantas</h3>
                     </div>
                     <div id="plants-list-container" class="plants-list">
-                        <script>
-                            // Example function to check if user is logged in
-                            function isLoggedIn() {
-                                // Replace with actual login check logic
-                                return false; // Assume user is not logged in for demonstration
-                            }
-
-                            document.addEventListener('DOMContentLoaded', function() {
-                                if (!isLoggedIn()) {
-                                    document.getElementById('join-agrosync-section').style.display = 'block';
-                                } else {
-                                    document.getElementById('join-agrosync-section').style.display = 'none';
-                                }
-                            });
-                        </script>
-                        
-                        <!-- Prompt de registro mejorado -->
-                        <div id="join-agrosync-section" style="display: none; text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%); border-radius: var(--border-radius-xl); margin: 1rem 0; color: white; position: relative; overflow: hidden; box-shadow: var(--shadow-xl);">
-                            <div style="position: relative; z-index: 2;">
-                                <div style="margin-bottom: 1.5rem;">
-                                    <i class="fas fa-lock" style="font-size: 4rem; margin-bottom: 1rem; display: block; opacity: 0.9;"></i>
-                                </div>
-                                <h3 style="margin-bottom: 1rem; font-size: 1.5rem; font-weight: 700;">
-                                    🌱 ¡Únete a AgroSync!
-                                </h3>
-                                <p style="margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.95; line-height: 1.6;">
-                                    Para gestionar tus plantas necesitas una cuenta.<br>
-                                    <strong>Es gratis</strong> y solo toma unos segundos.
-                                </p>
-                                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: var(--border-radius-lg); margin-bottom: 2rem; backdrop-filter: blur(10px);">
-                                    <h4 style="margin-bottom: 1rem; font-size: 1.1rem;">Con tu cuenta podrás:</h4>
-                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; text-align: left;">
-                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                            <i class="fas fa-seedling" style="color: #10b981; font-size: 1.2rem;"></i>
-                                            <span>Añadir tus plantas</span>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                            <i class="fas fa-chart-line" style="color: #10b981; font-size: 1.2rem;"></i>
-                                            <span>Monitorear su salud</span>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                            <i class="fas fa-robot" style="color: #10b981; font-size: 1.2rem;"></i>
-                                            <span>Usar el asistente IA</span>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                            <i class="fas fa-bell" style="color: #10b981; font-size: 1.2rem;"></i>
-                                            <span>Recibir alertas</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                                    <button onclick="window.location.href='register.html'" 
-                                            style="background: white; color: var(--primary-blue); border: none; padding: 1rem 2rem; 
-                                                   border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 700;
-                                                   transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem;
-                                                   box-shadow: 0 8px 25px rgba(0,0,0,0.2); font-size: 1.1rem;">
-                                        <i class="fas fa-user-plus"></i> Crear Cuenta Gratis
-                                    </button>
-                                    <button onclick="window.location.href='login.html'" 
-                                            style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 1rem 2rem; 
-                                                   border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 600;
-                                                   transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem;
-                                                   backdrop-filter: blur(10px); font-size: 1rem;">
-                                        <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
-                                    </button>
-                                </div>
-                            </div>
                         </div>
-                    </div>
                 </section>
 
                 <section class="card">
@@ -172,7 +99,6 @@
             </main>
         </div>
 
-        <!-- Otras páginas ocultas por defecto -->
         <div id="diagnosis" class="page">
             <main class="main-content">
                 <div class="page-header">
@@ -182,7 +108,7 @@
                 <section class="camera-section card">
                     <div class="camera-interface">
                         <div class="camera-preview">
-                            <video id="camera-preview" autoplay playsinline></video>
+                            <video id="camera-video-preview" autoplay playsinline></video>
                             <canvas id="camera-canvas" style="display:none;"></canvas>
                             <span class="camera-emoji"><i class="fas fa-camera-retro"></i></span>
                             <p>Apunta a la hoja afectada y toma una foto clara.</p>
@@ -204,61 +130,9 @@
                     <h2><i class="fas fa-comments"></i> Chatea con AgriBot</h2>
                     <p>Resuelve tus dudas sobre jardinería y agricultura.</p>
                 </div>
-                <section class="card">
-                    <div id="plants-list-container" class="plants-list">
-                        <!-- Prompt de registro mejorado -->
-                        <div id="seccion-unete-agrosync" style="text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%); border-radius: var(--border-radius-xl); margin: 1rem 0; color: white; position: relative; overflow: hidden; box-shadow: var(--shadow-xl);">
-                            <div style="position: relative; z-index: 2;">
-                                <div style="margin-bottom: 1.5rem;">
-                                    <i class="fas fa-lock" style="font-size: 4rem; margin-bottom: 1rem; display: block; opacity: 0.9;"></i>
-                                </div>
-                                <h3 style="margin-bottom: 1rem; font-size: 1.5rem; font-weight: 700;">
-                                    🌱 ¡Únete a AgroSync!
-                                </h3>
-                                <p style="margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.95; line-height: 1.6;">
-                                    Para chatear con AgriBot necesitas una cuenta.<br>
-                                    <strong>Es gratis</strong> y solo toma unos segundos.
-                                </p>
-                                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: var(--border-radius-lg); margin-bottom: 2rem; backdrop-filter: blur(10px);">
-                                    <h4 style="margin-bottom: 1rem; font-size: 1.1rem;">Con tu cuenta podrás:</h4>
-                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; text-align: left;">
-                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                            <i class="fas fa-comments" style="color: #10b981; font-size: 1.2rem;"></i>
-                                            <span>Chatear con AgriBot</span>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                            <i class="fas fa-question-circle" style="color: #10b981; font-size: 1.2rem;"></i>
-                                            <span>Resolver tus dudas</span>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                            <i class="fas fa-leaf" style="color: #10b981; font-size: 1.2rem;"></i>
-                                            <span>Obtener consejos</span>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                            <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.2rem;"></i>
-                                            <span>Recibir respuestas</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                                    <button onclick="window.location.href='register.html'" 
-                                            style="background: white; color: var(--primary-blue); border: none; padding: 1rem 2rem; 
-                                                   border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 700;
-                                                   transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem;
-                                                   box-shadow: 0 8px 25px rgba(0,0,0,0.2); font-size: 1.1rem;">
-                                        <i class="fas fa-user-plus"></i> Crear Cuenta Gratis
-                                    </button>
-                                    <button onclick="window.location.href='login.html'" 
-                                            style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 1rem 2rem; 
-                                                   border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 600;
-                                                   transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem;
-                                                   backdrop-filter: blur(10px); font-size: 1rem;">
-                                        <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
-                                    </button>
-                                </div>
-                            </div>
+                <section class="card" id="assistant-card">
+                    <div id="assistant-content-wrapper">
                         </div>
-                    </div>
                 </section>
             </main>
         </div>
@@ -285,25 +159,42 @@
 
         <div id="profile" class="page">
             <main class="main-content">
-                <div class="page-header">
-                    <h2><i class="fas fa-user-circle"></i> Mi Perfil</h2>
-                    <p>Inicia sesión o regístrate para acceder a todas las funciones.</p>
+                <div id="profile-guest-content">
+                    <div class="page-header">
+                        <h2><i class="fas fa-user-circle"></i> Mi Perfil</h2>
+                        <p>Inicia sesión o regístrate para acceder a todas las funciones.</p>
+                    </div>
+                    <section class="quick-actions">
+                        <button class="action-btn primary" onclick="window.location.href='login.html'">
+                            <span class="action-emoji"><i class="fas fa-sign-in-alt"></i></span>
+                            <span class="action-text">Iniciar Sesión</span>
+                        </button>
+                        <button class="action-btn success" onclick="window.location.href='register.html'">
+                             <span class="action-emoji"><i class="fas fa-user-plus"></i></span>
+                            <span class="action-text">Crear Cuenta</span>
+                        </button>
+                    </section>
                 </div>
-                <section class="quick-actions">
-                    <button class="action-btn primary" onclick="window.location.href='login.html'">
-                        <span class="action-emoji"><i class="fas fa-sign-in-alt"></i></span>
-                        <span class="action-text">Iniciar Sesión</span>
-                    </button>
-                    <button class="action-btn success" onclick="window.location.href='register.html'">
-                         <span class="action-emoji"><i class="fas fa-user-plus"></i></span>
-                        <span class="action-text">Crear Cuenta</span>
-                    </button>
-                </section>
+
+                <div id="profile-logged-in-content" style="display: none;">
+                    <div class="page-header">
+                        <h2><i class="fas fa-user-circle"></i> Mi Perfil</h2>
+                        <p id="profile-email">email@example.com</p>
+                    </div>
+                     <section class="card">
+                        <div class="profile-info">
+                            <div class="profile-avatar" id="profile-avatar-initials">JD</div>
+                            <h3 id="profile-username">John Doe</h3>
+                        </div>
+                        <button class="action-btn danger" id="logout-btn" style="width: 100%; background: var(--danger)">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </button>
+                    </section>
+                </div>
             </main>
         </div>
     </div> 
 
-    <!-- Navegación inferior -->
     <nav class="bottom-nav" id="main-bottom-nav">
         <button class="nav-item active" onclick="showPage('home')">
             <span class="nav-emoji"><i class="fas fa-home"></i></span>
@@ -327,7 +218,13 @@
         </button>
     </nav>
 
-    <!-- JavaScript simple y funcional -->
+    <script src="js/auth.js"></script>
+    <script src="js/plants.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/weather.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
     <script>
         // Función básica para cambiar páginas
         function showPage(pageId) {
@@ -355,51 +252,6 @@
                 activeNavItem.classList.add('active');
             }
         }
-
-        // Función de toggle de ubicación
-        function toggleLocation() {
-            console.log('Toggle ubicación');
-        }
-
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('AgroSync cargado correctamente');
-            showPage('home');
-        });
     </script>
-    <script src="js/assistant.js"></script>
-    <script src="js/camera.js"></script>
 </body>
 </html>
-
-<script>
-  function verificarSesion() {
-    fetch('backend/verificar_sesion.php')
-      .then(response => response.json())
-      .then(data => {
-        if (data.logueado) {
-          document.getElementById('nombre-usuario').textContent = data.nombre;
-          document.getElementById('botones-sesion').style.display = 'none';
-          document.getElementById('botones-usuario').style.display = 'block';
-        } else {
-          document.getElementById('botones-sesion').style.display = 'block';
-          document.getElementById('botones-usuario').style.display = 'none';
-        }
-      })
-      .catch(error => console.error('Error al verificar la sesión:', error));
-  }
-
-  document.addEventListener('DOMContentLoaded', verificarSesion);
-</script>
-
-<div id="perfil">
-  <h2>Perfil de <span id="nombre-usuario"></span></h2>
-  <div id="botones-sesion">
-    <button onclick="window.location.href='login.html'">Iniciar Sesión</button>
-    <button onclick="window.location.href='register.html'">Registrarse</button>
-  </div>
-  <div id="botones-usuario" style="display: none;">
-    <button onclick="window.location.href='mis_plantas.html'">Mis Plantas</button>
-    <button onclick="window.location.href='asistente.html'">Asistente</button>
-  </div>
-</div>
