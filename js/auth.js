@@ -98,11 +98,21 @@ async function checkLoginStatus() {
     }
 }
 
-function updateUIAfterLogin(user) {
+/**
+ * Actualiza la sección del perfil en la UI según el estado de la sesión.
+ * @param {object|null} user - El objeto de usuario o null.
+ */
+function updateProfileUI(user) {
+    const profileLoggedInContent = document.getElementById('profile-logged-in-content');
+    const profileGuestContent = document.getElementById('profile-guest-content');
+    
+    if (!profileLoggedInContent || !profileGuestContent) {
+        console.error("No se encontraron los contenedores de perfil.");
+        return;
+    }
+
     if (user) {
-        // --- Perfil ---
-        const profileLoggedInContent = document.getElementById('profile-logged-in-content');
-        const profileGuestContent = document.getElementById('profile-guest-content');
+        // Usuario logueado: mostrar sus datos y ocultar el mensaje de invitado
         const profileAvatar = document.getElementById('profile-avatar-initials');
         const profileUsername = document.getElementById('profile-username');
         const profileEmail = document.getElementById('profile-email');
@@ -111,33 +121,11 @@ function updateUIAfterLogin(user) {
         if (profileUsername) profileUsername.textContent = user.username;
         if (profileEmail) profileEmail.textContent = user.email;
 
-        if (profileLoggedInContent) profileLoggedInContent.style.display = 'block';
-        if (profileGuestContent) profileGuestContent.style.display = 'none';
-
-        // --- Actualizar Plantas y Asistente ---
-        if (typeof fetchAndDisplayPlants === 'function') {
-            fetchAndDisplayPlants();
-        }
-        
-        if (typeof updateAssistantForUser === 'function') {
-            updateAssistantForUser();
-        }
-    }
-}
-
-function updateUIForGuest() {
-    // --- Perfil ---
-    const profileLoggedInContent = document.getElementById('profile-logged-in-content');
-    const profileGuestContent = document.getElementById('profile-guest-content');
-    
-    if (profileLoggedInContent) profileLoggedInContent.style.display = 'none';
-    if (profileGuestContent) profileGuestContent.style.display = 'block';
-
-    // --- Actualizar Plantas y Asistente para invitado ---
-    if (typeof fetchAndDisplayPlants === 'function') {
-        fetchAndDisplayPlants(); // Mostrará el prompt de login
-    }
-    if (typeof updateAssistantForUser === 'function') {
-        updateAssistantForUser(); // Mostrará el mensaje de login requerido
+        profileLoggedInContent.style.display = 'block';
+        profileGuestContent.style.display = 'none';
+    } else {
+        // Invitado: mostrar mensaje para registrarse/loguearse
+        profileLoggedInContent.style.display = 'none';
+        profileGuestContent.style.display = 'block';
     }
 }

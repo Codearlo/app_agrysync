@@ -38,13 +38,13 @@ function calculateHealthPercentage(status) {
     }
 }
 
-function showLoginPrompt() {
+function showLoginPromptForPlants() {
     if (!plantsListContainer) return;
     
     plantsListContainer.innerHTML = '';
     
     const loginPrompt = document.createElement('div');
-    loginPrompt.id = 'join-agrosync-section'; 
+    loginPrompt.id = 'join-agrosync-section-plants'; 
     loginPrompt.style.cssText = `
         text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%); border-radius: var(--border-radius-xl); margin: 1rem 0; color: white; position: relative; overflow: hidden; box-shadow: var(--shadow-xl);
     `;
@@ -53,15 +53,14 @@ function showLoginPrompt() {
             <i class="fas fa-lock" style="font-size: 4rem; margin-bottom: 1rem; display: block; opacity: 0.9;"></i>
             <h3 style="margin-bottom: 1rem; font-size: 1.5rem; font-weight: 700;">🌱 ¡Únete a AgroSync!</h3>
             <p style="margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.95; line-height: 1.6;">
-                Para gestionar tus plantas necesitas una cuenta.<br>
-                <strong>Es gratis</strong> y solo toma unos segundos.
+                Para gestionar tus plantas necesitas una cuenta.
             </p>
             <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                <button onclick="window.location.href='register.html'" style="background: white; color: var(--primary-blue); border: none; padding: 1rem 2rem; border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 700; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 25px rgba(0,0,0,0.2); font-size: 1.1rem;">
-                    <i class="fas fa-user-plus"></i> Crear Cuenta Gratis
+                <button onclick="window.location.href='register.html'" style="background: white; color: var(--primary-blue); border: none; padding: 1rem 2rem; border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 700;">
+                    Crear Cuenta Gratis
                 </button>
-                <button onclick="window.location.href='login.html'" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 1rem 2rem; border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 600; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem; backdrop-filter: blur(10px); font-size: 1rem;">
-                    <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
+                <button onclick="window.location.href='login.html'" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 1rem 2rem; border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 600;">
+                    Ya tengo cuenta
                 </button>
             </div>
         </div>
@@ -69,23 +68,22 @@ function showLoginPrompt() {
     plantsListContainer.appendChild(loginPrompt);
 }
 
-async function fetchAndDisplayPlants() {
+/**
+ * Obtiene y muestra las plantas del usuario o un mensaje para iniciar sesión.
+ * @param {object|null} user - El objeto de usuario si está logueado, o null.
+ */
+async function fetchAndDisplayPlants(user) {
     if (!plantsListContainer) {
         console.error("Contenedor de lista de plantas no encontrado.");
         return;
     }
 
-    const user = await checkLoginStatus();
-
     if (!user || !user.id) {
-        console.log("Usuario no logueado, mostrando prompt de login");
-        showLoginPrompt();
+        showLoginPromptForPlants();
         return;
     }
 
-    console.log(`Fetching plants for user ID: ${user.id}`);
-
-    plantsListContainer.innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--gray-500);"><i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i> Cargando...</div>`;
+    plantsListContainer.innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--gray-500);"><i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i> Cargando tus plantas...</div>`;
 
     try {
         const response = await fetch(`backend/get_plants.php?user_id=${user.id}`); 
@@ -101,7 +99,7 @@ async function fetchAndDisplayPlants() {
                 <div style="text-align: center; color: var(--gray-500); padding: 2rem 1rem;">
                     <i class="fas fa-seedling" style="font-size: 3rem; color: var(--primary-green);"></i>
                     <h4 style="margin: 1rem 0;">¡Aún no tienes plantas!</h4>
-                    <p>Añade tu primera planta desde tu perfil para empezar.</p>
+                    <p>Puedes añadir tu primera planta desde tu perfil.</p>
                 </div>
             `;
             plantsListContainer.appendChild(noPlants);

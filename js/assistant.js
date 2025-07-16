@@ -5,7 +5,7 @@ let userInputAssistant;
 let sendMessageBtnAssistant;
 let assistantContentWrapper;
 
-function setupAssistantUI() {
+function setupAssistantChatUI() {
     assistantContentWrapper = document.getElementById('assistant-content-wrapper');
     if (!assistantContentWrapper) return;
 
@@ -27,25 +27,24 @@ function setupAssistantUI() {
     initializeAssistantEventListeners();
 }
 
-function showLoginRequiredMessage() {
+function showLoginPromptForAssistant() {
     assistantContentWrapper = document.getElementById('assistant-content-wrapper');
     if (!assistantContentWrapper) return;
     
     assistantContentWrapper.innerHTML = `
-        <div id="seccion-unete-agrosync" style="text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%); border-radius: var(--border-radius-xl); margin: 1rem 0; color: white; position: relative; overflow: hidden; box-shadow: var(--shadow-xl);">
+        <div id="seccion-unete-agrosync-asistente" style="text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%); border-radius: var(--border-radius-xl); margin: 1rem 0; color: white; position: relative; overflow: hidden; box-shadow: var(--shadow-xl);">
             <div style="position: relative; z-index: 2;">
                 <i class="fas fa-lock" style="font-size: 4rem; margin-bottom: 1rem; display: block; opacity: 0.9;"></i>
                 <h3 style="margin-bottom: 1rem; font-size: 1.5rem; font-weight: 700;">🌱 ¡Únete a AgroSync!</h3>
                 <p style="margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.95; line-height: 1.6;">
-                    Para chatear con AgriBot necesitas una cuenta.<br>
-                    <strong>Es gratis</strong> y solo toma unos segundos.
+                    Para chatear con AgriBot necesitas una cuenta.
                 </p>
                 <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <button onclick="window.location.href='register.html'" style="background: white; color: var(--primary-blue); border: none; padding: 1rem 2rem; border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 700; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 25px rgba(0,0,0,0.2); font-size: 1.1rem;">
-                        <i class="fas fa-user-plus"></i> Crear Cuenta Gratis
+                    <button onclick="window.location.href='register.html'" style="background: white; color: var(--primary-blue); border: none; padding: 1rem 2rem; border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 700;">
+                        Crear Cuenta Gratis
                     </button>
-                    <button onclick="window.location.href='login.html'" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 1rem 2rem; border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 600; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.75rem; backdrop-filter: blur(10px); font-size: 1rem;">
-                        <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
+                    <button onclick="window.location.href='login.html'" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 1rem 2rem; border-radius: var(--border-radius-lg); cursor: pointer; font-weight: 600;">
+                        Ya tengo cuenta
                     </button>
                 </div>
             </div>
@@ -123,13 +122,15 @@ function initializeAssistantEventListeners() {
     }
 }
 
-async function updateAssistantForUser() {
-    const user = await checkLoginStatus();
-    
+/**
+ * Actualiza la interfaz del asistente según el estado de la sesión.
+ * @param {object|null} user - El objeto de usuario o null.
+ */
+function updateAssistantUI(user) {
     if (user) {
-        setupAssistantUI();
+        setupAssistantChatUI();
         addMessageToChat(`¡Hola ${user.username}! 🌱 Soy AgriBot, ¿en qué puedo ayudarte hoy?`, 'bot');
     } else {
-        showLoginRequiredMessage();
+        showLoginPromptForAssistant();
     }
 }
