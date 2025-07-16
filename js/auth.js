@@ -61,8 +61,8 @@ async function handleLoginFormSubmit(event) {
             body: JSON.stringify({ login_identifier, password })
         });
         const result = await response.json();
-        if (result.success && result.user) {
-            localStorage.setItem('agroSyncUser', JSON.stringify(result.user));
+        if (result.success) {
+            // Ya no guardamos en localStorage. La sesión se maneja por cookies.
             window.location.href = 'index.html'; 
         } else {
             messageElement.textContent = result.message || 'Error en el inicio de sesión.';
@@ -75,30 +75,30 @@ async function handleLoginFormSubmit(event) {
     }
 }
 
-function logoutUser() {
-    localStorage.removeItem('agroSyncUser');
-    updateUIForGuest(); // Actualizar UI al estado de invitado
-    
-    // Actualizar la sección de plantas para mostrar el prompt de login
-    if (typeof fetchAndDisplayPlants === 'function') {
-        fetchAndDisplayPlants();
+async function logoutUser() {
+    try {
+        await fetch(`${BASE_URL_BACKEND_AUTH}logout_user.php`);
+    } catch (error) {
+        console.error("Error al cerrar sesión en el backend:", error);
+    } finally {
+        // Redirigir a la página de inicio de sesión o a la home
+        window.location.href = 'login.html';
     }
-    
-    // Actualizar el asistente para mostrar el prompt de login
-    if (typeof updateAssistantForUser === 'function') {
-        updateAssistantForUser();
-    }
-    
-    showPage('home'); // Ir a la página de inicio
 }
 
-function checkLoginStatus() {
-    const userData = localStorage.getItem('agroSyncUser');
-    if (userData) {
-        try { return JSON.parse(userData); } 
-        catch (e) { localStorage.removeItem('agroSyncUser'); return null; }
+async function checkLoginStatus() {
+    try {
+        const response = await fetch(`${BASE_URL_BACKEND_AUTH}verificar_sesion.php`, {
+            // Evitar que la respuesta sea cacheada por el navegador
+            cache: 'no-cache'
+        });
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data.loggedIn ? data.user : null;
+    } catch (error) {
+        console.error("Error verificando el estado de la sesión:", error);
+        return null;
     }
-    return null;
 }
 
 function updateUIAfterLogin(user) {
@@ -120,19 +120,16 @@ function updateUIAfterLogin(user) {
         if (profileStatsGrid) profileStatsGrid.style.display = 'grid';
         if (profileAchievementsCard) profileAchievementsCard.style.display = 'block';
 
-        // Actualizar subtítulo del header en la página de perfil
         const profilePage = document.getElementById('profile');
         if (profilePage && profilePage.classList.contains('active')) {
             const headerSubtitleEl = document.getElementById('header-app-subtitle');
             if (headerSubtitleEl) headerSubtitleEl.textContent = `¡Bienvenido, ${user.username}!`;
         }
         
-        // Actualizar la sección de plantas para cargar las plantas del usuario
         if (typeof fetchAndDisplayPlants === 'function') {
             fetchAndDisplayPlants();
         }
         
-        // Actualizar el asistente para el usuario logueado
         if (typeof updateAssistantForUser === 'function') {
             updateAssistantForUser();
         }
@@ -150,14 +147,12 @@ function updateUIForGuest() {
     if (profileStatsGrid) profileStatsGrid.style.display = 'none';
     if (profileAchievementsCard) profileAchievementsCard.style.display = 'none';
 
-    // Actualizar subtítulo del header en la página de perfil para invitado
     const profilePage = document.getElementById('profile');
     if (profilePage && profilePage.classList.contains('active')) {
          const headerSubtitleEl = document.getElementById('header-app-subtitle');
          if (headerSubtitleEl) headerSubtitleEl.textContent = "Únete a la comunidad AgroSync";
     }
     
-    // Restablecer el subtítulo general del header si se está en otra página
     const currentPageId = document.querySelector('.page.active')?.id || 'home';
     if (typeof updateAppHeader === "function" && currentPageId !== 'profile') {
         updateAppHeader(currentPageId);

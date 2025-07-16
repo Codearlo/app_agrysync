@@ -1,99 +1,43 @@
 // js/main.js
 
 document.addEventListener('DOMContentLoaded', async function() { 
-    console.log("DOM cargado. Iniciando AgroSync main.js (modo acceso público).");
+    console.log("DOM cargado. Iniciando AgroSync main.js.");
 
-    const loggedInUser = checkLoginStatus(); // auth.js
-    const mainAppHeaderContainer = document.getElementById('main-app-header');
-    const mainBottomNavContainer = document.getElementById('main-bottom-nav');
+    // Ahora checkLoginStatus es asíncrono, usamos await
+    const loggedInUser = await checkLoginStatus(); 
+    
     const appContainer = document.querySelector('.app-container'); 
 
-    if (!mainAppHeaderContainer || !mainBottomNavContainer || !appContainer) {
-        console.error("Error crítico: Faltan contenedores base. Verifica index.html.");
+    if (!appContainer) {
+        console.error("Error crítico: Falta el contenedor principal .app-container.");
         document.body.innerHTML = "<p style='color:red; font-size:18px; text-align:center; padding:20px;'>Error crítico de la aplicación.</p>";
         return;
     }
-
-    // Verificar si el header y navegación ya tienen contenido (modo estático)
-    const headerHasContent = mainAppHeaderContainer.querySelector('.header-content') !== null;
-    const navHasContent = mainBottomNavContainer.querySelector('.nav-item') !== null;
-
-    console.log("Header tiene contenido:", headerHasContent);
-    console.log("Navegación tiene contenido:", navHasContent);
-
-    // Solo cargar dinámicamente si no existe contenido estático
-    if (!headerHasContent) {
-        console.log("Cargando header dinámicamente...");
-        if (typeof loadAppHeaderStructure === 'function') {
-            await loadAppHeaderStructure();
-        } else {
-            console.error("loadAppHeaderStructure no definida.");
-            mainAppHeaderContainer.innerHTML = "<div class='header-content'><div class='app-title'>AgroSync <i class='fas fa-leaf'></i></div><div class='app-subtitle'>Tu jardín inteligente</div></div>";
-        }
-    }
-
-    if (!navHasContent) {
-        console.log("Cargando navegación dinámicamente...");
-        if (typeof loadBottomNavigationStructure === 'function') {
-            await loadBottomNavigationStructure();
-        } else {
-            console.error("loadBottomNavigationStructure no definida.");
-        }
-    }
     
-    // La barra de navegación siempre es visible
-    if (mainBottomNavContainer) {
-        mainBottomNavContainer.style.display = 'flex';
-    }
-
-    // Configurar usuario
+    // Configurar el estado de la UI basado en si el usuario está logueado o no
     if (loggedInUser) {
         console.log("Usuario logueado:", loggedInUser);
+        // Asegúrate de que las funciones para actualizar la UI existen
         if (typeof updateUIAfterLogin === 'function') updateUIAfterLogin(loggedInUser);
         if (typeof fetchAndDisplayPlants === 'function') fetchAndDisplayPlants();
     } else {
         console.log("Usuario no logueado (invitado).");
         if (typeof updateUIForGuest === 'function') updateUIForGuest();
-        if (typeof fetchAndDisplayPlants === 'function') fetchAndDisplayPlants();
+        if (typeof fetchAndDisplayPlants === 'function') fetchAndDisplayPlants(); // Muestra el prompt de login
     }
     
-    // Mostrar página inicial
+    // El resto de la inicialización
+    const currentPageId = document.querySelector('.page.active')?.id || 'home';
     if (typeof showPage === 'function') {
-        showPage('home'); 
+        showPage(currentPageId); 
     } else {
-        console.error("showPage no definida.");
-        // Función básica de respaldo
-        window.showPage = function(pageId) {
-            console.log('Mostrando página:', pageId);
-            
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            const targetPage = document.getElementById(pageId);
-            if (targetPage) {
-                targetPage.classList.add('active');
-            }
-            
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            const activeNavItem = document.querySelector(`[onclick="showPage('${pageId}')"]`);
-            if (activeNavItem) {
-                activeNavItem.classList.add('active');
-            }
-        };
-        window.showPage('home');
+        console.error("La función showPage no está definida. Revisa la carga de tus scripts.");
     }
     
-    // Cargar clima
     if (typeof getGeoLocationAndFetchWeather === 'function') {
         getGeoLocationAndFetchWeather();
-    } else {
-        console.error("getGeoLocationAndFetchWeather no definida.");
     }
-
+    
     // --- EVENT LISTENERS ---
     const logoutButton = document.getElementById('logout-btn');
     if (logoutButton && typeof logoutUser === 'function') {
@@ -110,29 +54,19 @@ document.addEventListener('DOMContentLoaded', async function() {
         addPlantForm.addEventListener('submit', handleAddPlantFormSubmit);
     }
 
-    // Inicializar chat del asistente
     if (typeof initializeAssistantChat === 'function') {
         initializeAssistantChat();
     }
     
-    // Inicializar el estado del asistente según el usuario
     if (typeof updateAssistantForUser === 'function') {
+        // Se llama dentro de updateUIAfterLogin o updateUIForGuest, pero podemos asegurarlo aquí
         updateAssistantForUser();
     }
     
-    // Inicializar toggles y configuraciones
-    if (typeof initializeDarkMode === 'function') {
-        initializeDarkMode();
-    }
-    if (typeof initializeLocationToggle === 'function') {
-        initializeLocationToggle();
-    }
-    if (typeof initializeTouchFeedback === 'function') {
-        initializeTouchFeedback();
-    }
-    if (typeof initializeGenericToggles === 'function') {
-        initializeGenericToggles();
-    }
+    if (typeof initializeDarkMode === 'function') initializeDarkMode();
+    if (typeof initializeLocationToggle === 'function') initializeLocationToggle();
+    if (typeof initializeTouchFeedback === 'function') initializeTouchFeedback();
+    if (typeof initializeGenericToggles === 'function') initializeGenericToggles();
 
     console.log("AgroSync inicializado correctamente.");
 });

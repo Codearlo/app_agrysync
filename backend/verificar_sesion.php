@@ -1,10 +1,15 @@
 <?php
+// backend/verificar_sesion.php
 session_start();
 header('Content-Type: application/json');
-$response = ['logueado' => false, 'nombre' => ''];
-if (isset($_SESSION['usuario'])) {
-  $response['logueado'] = true;
-  $response['nombre'] = $_SESSION['usuario']['nombre']; // Ajusta según tu estructura de sesión
+
+$response = ['loggedIn' => false, 'user' => null];
+
+// Comprobar si la variable de sesión 'user' está establecida
+if (isset($_SESSION['user']) && isset($_SESSION['user']['id'])) {
+    $response['loggedIn'] = true;
+    $response['user'] = $_SESSION['user']; 
 }
+
 echo json_encode($response);
 ?>

@@ -2,12 +2,15 @@
 // backend/login_user.php
 require 'db_connect.php';
 
+// Iniciar la sesión al principio del script
+session_start();
+
 header('Content-Type: application/json');
 
 $data = json_decode(file_get_contents('php://input'), true);
 $response = ["success" => false, "message" => "", "user" => null];
 
-if (isset($data['login_identifier']) && isset($data['password'])) { // login_identifier puede ser username o email
+if (isset($data['login_identifier']) && isset($data['password'])) {
     $login_identifier = trim($data['login_identifier']);
     $password = $data['password'];
 
@@ -18,7 +21,6 @@ if (isset($data['login_identifier']) && isset($data['password'])) { // login_ide
         exit();
     }
 
-    // Buscar usuario por username o email
     $stmt = $conn->prepare("SELECT id, username, email, password_hash FROM users WHERE username = ? OR email = ?");
     if ($stmt === false) {
         $response["message"] = "Error preparando la consulta: " . $conn->error;
@@ -26,24 +28,29 @@ if (isset($data['login_identifier']) && isset($data['password'])) { // login_ide
         echo json_encode($response);
         exit();
     }
+    
     $stmt->bind_param("ss", $login_identifier, $login_identifier);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
-        // Verificar la contraseña
         if (password_verify($password, $user['password_hash'])) {
-            $response["success"] = true;
-            $response["message"] = "Inicio de sesión exitoso.";
-            // Devolver información del usuario (sin el hash de la contraseña)
-            $response["user"] = [
+            // Regenerar el ID de la sesión para prevenir session fixation
+            session_regenerate_id(true);
+
+            // Guardar la información del usuario en la variable de sesión
+            $_SESSION['user'] = [
                 "id" => $user['id'],
                 "username" => $user['username'],
                 "email" => $user['email']
             ];
-            // Aquí podrías iniciar una sesión PHP o generar un token JWT
-            // Por ahora, el frontend guardará el user_id en localStorage
+
+            $response["success"] = true;
+            $response["message"] = "Inicio de sesión exitoso.";
+            // Devolver los datos del usuario para que el frontend pueda usarlos inmediatamente
+            $response["user"] = $_SESSION['user'];
+            
         } else {
             $response["message"] = "Contraseña incorrecta.";
             http_response_code(401); // Unauthorized
