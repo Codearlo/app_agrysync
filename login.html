@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Iniciar Sesión - AgroSync</title>
-    <!-- CSS -->
     <link rel="stylesheet" href="/css/base.css?v=1">
     <link rel="stylesheet" href="/css/auth.css?v=1">
     <link rel="stylesheet" href="/css/dark_mode.css?v=1">
@@ -78,20 +77,20 @@
         </main>
     </div>
 
-    <!-- Scripts necesarios para esta página -->
     <script src="js/auth.js"></script> 
     <script>
         // Adjuntar event listener específico para esta página
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() { // <-- AÑADIDO 'async'
+            // Verificar si el usuario ya está logueado y redirigir a index.html si es así
+            const loggedInUser = await checkLoginStatus(); // <-- AÑADIDO 'await'
+            if (loggedInUser) {
+                window.location.href = 'index.html';
+                return; // Detener la ejecución del script si se redirige
+            }
+
             const loginForm = document.getElementById('login-form');
             if (loginForm && typeof handleLoginFormSubmit === 'function') {
                 loginForm.addEventListener('submit', handleLoginFormSubmit);
-            }
-
-            // Verificar si el usuario ya está logueado y redirigir a index.html si es así
-            const loggedInUser = checkLoginStatus();
-            if (loggedInUser) {
-                window.location.href = 'index.html';
             }
             
             // Agregar efectos de enfoque automático

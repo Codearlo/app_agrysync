@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Registro - AgroSync</title>
-    <!-- CSS -->
     <link rel="stylesheet" href="/css/base.css?v=1">
     <link rel="stylesheet" href="/css/auth.css?v=1">
     <link rel="stylesheet" href="/css/dark_mode.css?v=1">
@@ -100,20 +99,20 @@
         </main>
     </div>
 
-    <!-- Scripts necesarios para esta página -->
     <script src="js/auth.js"></script>
     <script>
         // Adjuntar event listener específico para esta página
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() { // <-- AÑADIDO 'async'
+            // Verificar si el usuario ya está logueado
+            const loggedInUser = await checkLoginStatus(); // <-- AÑADIDO 'await'
+            if (loggedInUser) {
+                window.location.href = 'index.html';
+                return; // Detener la ejecución del script si se redirige
+            }
+            
             const registerForm = document.getElementById('register-form');
             if (registerForm && typeof handleRegisterFormSubmit === 'function') {
                 registerForm.addEventListener('submit', handleRegisterFormSubmit);
-            }
-            
-            // Verificar si el usuario ya está logueado
-            const loggedInUser = checkLoginStatus();
-            if (loggedInUser) {
-                window.location.href = 'index.html';
             }
             
             // Agregar efectos de enfoque automático
